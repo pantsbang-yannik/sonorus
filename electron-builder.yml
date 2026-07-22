@@ -1,0 +1,36 @@
+# 打包配置（发布准备①）。铁律：files 白名单制——只进编译产物，
+# docs/tests/scripts/native 源码/shapes-src 源模型天然不进包。
+appId: com.sonorus.app
+productName: Sonorus
+afterPack: scripts/strip-sourcemaps.cjs
+afterSign: scripts/adhoc-sign.cjs
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**
+  # 排除 node_modules：electron-builder 默认会强制打包生产依赖，
+  # 但 vite 已把五个 dependencies 全部打进 out/，包内 node_modules 是死代码，故显式排除
+  - '!node_modules/**'
+extraResources:
+  - from: native/mac-tap/sonorus-tap
+    to: sonorus-tap
+  - from: vendor/media-control
+    to: media-control
+  - from: assets/shapes
+    to: assets/shapes
+  - from: assets/licenses
+    to: assets/licenses
+mac:
+  target:
+    - target: dmg
+      arch: [arm64]
+  category: public.app-category.music
+  minimumSystemVersion: '14.2'
+  extendInfo:
+    NSAudioCaptureUsageDescription: Sonorus 需要捕获系统音频，用于把正在播放的声音实时可视化。
+dmg:
+  contents:
+    - { x: 130, y: 220 }
+    - { x: 410, y: 220, type: link, path: /Applications }
+npmRebuild: false

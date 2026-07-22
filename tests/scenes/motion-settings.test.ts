@@ -1,0 +1,61 @@
+import { describe, it, expect } from 'vitest'
+import { DEFAULT_MOTION_SETTINGS, MOTION_LIMITS, sanitizeMotionSettings, climaxScale } from '../../src/scenes/nebula/motion/types'
+
+describe('MotionSettings sanitize（惯例同 sanitizeShapeSettings：坏数据回默认，数值钳限幅）', () => {
+  it('非对象/空对象 → 全默认', () => {
+    expect(sanitizeMotionSettings(null)).toEqual(DEFAULT_MOTION_SETTINGS)
+    expect(sanitizeMotionSettings({})).toEqual(DEFAULT_MOTION_SETTINGS)
+  })
+  it('数值出界钳到 limits；NaN/类型错回默认', () => {
+    const s = sanitizeMotionSettings({ bombIntensity: 99, detailDensity: -1, waveSpeed: NaN, buildDepth: '高', strobeEnabled: 0 })
+    expect(s.bombIntensity).toBe(MOTION_LIMITS.bombIntensity.max)
+    expect(s.detailDensity).toBe(MOTION_LIMITS.detailDensity.min)
+    expect(s.waveSpeed).toBe(DEFAULT_MOTION_SETTINGS.waveSpeed)
+    expect(s.buildDepth).toBe(DEFAULT_MOTION_SETTINGS.buildDepth)
+    expect(s.strobeEnabled).toBe(DEFAULT_MOTION_SETTINGS.strobeEnabled)
+  })
+  it('合法值原样通过（含线条系 fb2 两旋钮、九个专属键与高潮亮度）', () => {
+    const s = sanitizeMotionSettings({ bombIntensity: 1.4, detailDensity: 0.5, waveSpeed: 1.8, buildDepth: 0.3, strobeEnabled: false, climaxBrightness: 1.2, lineBrightness: 1.6, lineBarHeight: 0.8, eclipseWaveLen: 0.7, eclipseWaveGap: 0.5, eclipseCorona: 1.8, ledDensity: 1.6, ledWaveSpeed: 0.8, ledCross: 0.2, laserSpread: 1.2, laserSpeed: 1.7, laserChaos: 0.1, laserMaxCount: 6 })
+    expect(s).toEqual({ bombIntensity: 1.4, detailDensity: 0.5, waveSpeed: 1.8, buildDepth: 0.3, strobeEnabled: false, climaxBrightness: 1.2, lineBrightness: 1.6, lineBarHeight: 0.8, eclipseWaveLen: 0.7, eclipseWaveGap: 0.5, eclipseCorona: 1.8, ledDensity: 1.6, ledWaveSpeed: 0.8, ledCross: 0.2, laserSpread: 1.2, laserSpeed: 1.7, laserChaos: 0.1, laserMaxCount: 6 })
+  })
+  it('线条系旋钮：出界钳限幅、缺字段回默认（老落盘设置无这两字段=平滑升级）', () => {
+    const s = sanitizeMotionSettings({ lineBrightness: 99, lineBarHeight: 0 })
+    expect(s.lineBrightness).toBe(MOTION_LIMITS.lineBrightness.max)
+    expect(s.lineBarHeight).toBe(MOTION_LIMITS.lineBarHeight.min)
+    const old = sanitizeMotionSettings({ bombIntensity: 1.2 })
+    expect(old.lineBrightness).toBe(DEFAULT_MOTION_SETTINGS.lineBrightness)
+    expect(old.lineBarHeight).toBe(DEFAULT_MOTION_SETTINGS.lineBarHeight)
+  })
+  it('九个新键：出界钳限幅（各键上下界+1/-1）', () => {
+    const s = sanitizeMotionSettings({ eclipseWaveLen: 2, eclipseWaveGap: -0.1, eclipseCorona: 2.5, ledDensity: 2.5, ledWaveSpeed: -0.1, ledCross: 2, laserSpread: 2, laserSpeed: 2.5, laserChaos: 1.5 })
+    expect(s.eclipseWaveLen).toBe(MOTION_LIMITS.eclipseWaveLen.max)
+    expect(s.eclipseWaveGap).toBe(MOTION_LIMITS.eclipseWaveGap.min)
+    expect(s.eclipseCorona).toBe(MOTION_LIMITS.eclipseCorona.max)
+    expect(s.ledDensity).toBe(MOTION_LIMITS.ledDensity.max)
+    expect(s.ledWaveSpeed).toBe(MOTION_LIMITS.ledWaveSpeed.min)
+    expect(s.ledCross).toBe(MOTION_LIMITS.ledCross.max)
+    expect(s.laserSpread).toBe(MOTION_LIMITS.laserSpread.max)
+    expect(s.laserSpeed).toBe(MOTION_LIMITS.laserSpeed.max)
+    expect(s.laserChaos).toBe(MOTION_LIMITS.laserChaos.max)
+  })
+  it('高潮亮度：缺失回默认 1（老档案平滑升级=升级即见压档）、非默认界值保留、出界钳限、类型错回默认', () => {
+    expect(sanitizeMotionSettings({}).climaxBrightness).toBe(1)
+    expect(sanitizeMotionSettings({ climaxBrightness: 0.3 }).climaxBrightness).toBe(MOTION_LIMITS.climaxBrightness.min)
+    expect(sanitizeMotionSettings({ climaxBrightness: 1.5 }).climaxBrightness).toBe(MOTION_LIMITS.climaxBrightness.max)
+    expect(sanitizeMotionSettings({ climaxBrightness: 9 }).climaxBrightness).toBe(MOTION_LIMITS.climaxBrightness.max)
+    expect(sanitizeMotionSettings({ climaxBrightness: 0 }).climaxBrightness).toBe(MOTION_LIMITS.climaxBrightness.min)
+    expect(sanitizeMotionSettings({ climaxBrightness: '亮' }).climaxBrightness).toBe(1)
+  })
+  it('climaxScale：默认档=0.65 压档，拉满 1.5≈旧强度 0.975，最柔 0.3=0.195', () => {
+    expect(climaxScale(1)).toBeCloseTo(0.65, 5)
+    expect(climaxScale(1.5)).toBeCloseTo(0.975, 5)
+    expect(climaxScale(0.3)).toBeCloseTo(0.195, 5)
+  })
+  it('光束数量：缺键回默认 8、非默认界值保留、出界钳限（#激光动态束）', () => {
+    expect(sanitizeMotionSettings({}).laserMaxCount).toBe(8)
+    expect(sanitizeMotionSettings({ laserMaxCount: 4 }).laserMaxCount).toBe(MOTION_LIMITS.laserMaxCount.min)
+    expect(sanitizeMotionSettings({ laserMaxCount: 14 }).laserMaxCount).toBe(MOTION_LIMITS.laserMaxCount.max)
+    expect(sanitizeMotionSettings({ laserMaxCount: 99 }).laserMaxCount).toBe(MOTION_LIMITS.laserMaxCount.max)
+    expect(sanitizeMotionSettings({ laserMaxCount: 0 }).laserMaxCount).toBe(MOTION_LIMITS.laserMaxCount.min)
+  })
+})

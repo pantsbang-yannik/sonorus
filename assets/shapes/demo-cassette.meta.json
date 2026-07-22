@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "count": 450000,
+  "layout": "pos3f32+norm3f32",
+  "targetRadius": 1.3,
+  "center": [
+    0.341147780418396,
+    -0.5452542304992676,
+    -0.23157519102096558
+  ],
+  "scale": 0.3376810920820911,
+  "rot": "z90,x90",
+  "source": "https://sketchfab.com/3d-models/sony-cassette-0bdcf9e02a8a4abd8ef61f21fdddd119",
+  "license": "CC-BY-4.0",
+  "bakedAt": "2026-07-21T16:06:48.738Z"
+}

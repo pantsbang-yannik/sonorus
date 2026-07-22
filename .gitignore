@@ -1,0 +1,12 @@
+node_modules/
+out/
+dist/
+native/mac-tap/sonorus-tap
+*.log
+native/mac-tap/_CodeSignature/
+.DS_Store
+.superpowers/
+assets/shapes-src/
+build/icon.icns
+build/icon.iconset/
+assets/audio-src/

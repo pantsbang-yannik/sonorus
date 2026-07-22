@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "count": 450000,
+  "layout": "pos3f32+norm3f32",
+  "targetRadius": 1.3,
+  "center": [
+    -0.1128808856010437,
+    1.0784586071968079,
+    2.384185791015625e-7
+  ],
+  "scale": 0.6888517031405231,
+  "source": "https://sketchfab.com/3d-models/headphones-9787e82ab3f441ac874490ecf369980b",
+  "license": "CC-BY-4.0",
+  "bakedAt": "2026-07-21T16:06:48.853Z"
+}
