@@ -4,7 +4,7 @@
 
 Sonorus 是一款 macOS 音乐可视化应用：监听系统正在播放的任何音乐（Apple Music、网易云、浏览器……），实时化作会呼吸的粒子星云——不挑播放器，不用导入，放歌即显形。
 
-<!-- TODO: 转公开前补一张主界面截图/动图 -->
+https://github.com/user-attachments/assets/6d1dbbff-465f-458d-bcf7-59de5e48db71
 
 ## 功能
 
