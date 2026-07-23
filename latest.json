@@ -1,8 +1,8 @@
 {
-  "version": "0.1.0",
+  "version": "0.1.1",
   "minVersion": "0.1.0",
   "publishedAt": "2026-07-23",
-  "notes": "首个开源版本：粒子星云 / 歌词粒子 / 自定义形状 / 本地播放 / 星系图鉴 / 海报与回放导出",
-  "downloadUrl": "https://github.com/pantsbang-yannik/audelyra/releases/download/v0.1.0/Audelyra-0.1.0-arm64.dmg",
+  "notes": "星尘更疏朗、歌词更易读、线条不抢光",
+  "downloadUrl": "https://github.com/pantsbang-yannik/audelyra/releases/download/v0.1.1/Audelyra-0.1.1-arm64.dmg",
   "mirrorUrl": null
 }
