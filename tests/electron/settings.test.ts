@@ -6,6 +6,7 @@ import { DEFAULT_SETTINGS, sanitizeSettings, SettingsStore } from '../../electro
 import { defaultRhythmPreset } from '../../src/scenes/nebula/mapping/spec'
 import { DEFAULT_LYRICS_SETTINGS } from '../../src/scenes/nebula/lyrics/lyrics-fx'
 import { DEFAULT_CAMERA_SETTINGS } from '../../src/scenes/nebula/camera-types'
+import { DEFAULT_BACKGROUND_SETTINGS } from '../../src/scenes/nebula/background-types'
 
 const tmpFile = (): string => join(mkdtempSync(join(tmpdir(), 'audelyra-settings-')), 'settings.json')
 
@@ -217,8 +218,9 @@ describe('lyrics 设置（歌词二期批1 T5）', () => {
 
 describe('background 设置（虚空之镜 Task 1）', () => {
   it('background 字段：缺失回默认、出界钳限幅、坏 patch 不落盘', () => {
-    expect(sanitizeSettings({}).background).toEqual({ aurora: 1, ripple: 1, dust: 0.7, dustSize: 1, dustBright: 1, mirror: true, customBackgrounds: [], current: 'aurora', bgOpacity: 0.8, bgSaturation: 1, bgBreathe: true, bgShowBodies: false })
+    expect(sanitizeSettings({}).background).toEqual(DEFAULT_BACKGROUND_SETTINGS)
+    // 三个越界值各自钳到量程端点（字面量即被测行为本身），其余字段回默认
     expect(sanitizeSettings({ background: { aurora: 5, ripple: -2, dust: 2 } }).background)
-      .toEqual({ aurora: 1, ripple: 0, dust: 1, dustSize: 1, dustBright: 1, mirror: true, customBackgrounds: [], current: 'aurora', bgOpacity: 0.8, bgSaturation: 1, bgBreathe: true, bgShowBodies: false })
+      .toEqual({ ...DEFAULT_BACKGROUND_SETTINGS, aurora: 1, ripple: 0, dust: 1 })
   })
 })

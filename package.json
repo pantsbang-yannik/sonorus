@@ -1,6 +1,6 @@
 {
   "name": "audelyra",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Audelyra — 让声音显形",
   "main": "./out/main/main.js",
   "scripts": {

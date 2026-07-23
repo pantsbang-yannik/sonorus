@@ -13,9 +13,11 @@ export interface LyricsSettings {
   dynamicsGain: number      // 亲验 fb1-D：节奏三层（呼吸/脉冲/burst）幅度缩放；钳 [0,2] 默认 1，0≈幅度层纯静态（对拍时序仍由 dynamics 总闸管）
 }
 
-// 发布默认（发布准备③ 用户复调：字大、贴底）：最下方大字低亮弱动态——可读性优先，仍不抢星云主体
+// 发布默认（发布准备③ 用户复调：字大、贴底）：最下方大字低亮弱动态——可读性优先，仍不抢星云主体。
+// 首启观感调优（2026-07-23 用户复调）：字再大一档、动态再弱三分之二——歌词求「稳稳可读」，
+// 律动交给星云本体表达
 export const DEFAULT_LYRICS_SETTINGS: LyricsSettings = {
-  enabled: true, position: -2, scale: 1.4, dynamics: true, brightness: 0.6, dynamicsGain: 0.15
+  enabled: true, position: -2, scale: 1.5, dynamics: true, brightness: 0.6, dynamicsGain: 0.05
 }
 export const LYRICS_SCALE_MIN = 0.5
 export const LYRICS_SCALE_MAX = 2

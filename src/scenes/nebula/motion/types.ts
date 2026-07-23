@@ -21,9 +21,11 @@ export interface MotionSettings {
   laserMaxCount: number // 光束数量上限：束数随能量在 2..上限 间浮动+鼓点瞬增（#激光动态束）
 }
 
+// lineBrightness 首启观感调优（2026-07-23 用户复调）：1 → 0.6，线条系五类共享此值，
+// 压暗后线条退为骨架、不与主粒子抢光
 export const DEFAULT_MOTION_SETTINGS: MotionSettings = {
   bombIntensity: 1, detailDensity: 1, waveSpeed: 1, buildDepth: 0.6, strobeEnabled: true, climaxBrightness: 1,
-  lineBrightness: 1, lineBarHeight: 1,
+  lineBrightness: 0.6, lineBarHeight: 1,
   eclipseWaveLen: 1, eclipseWaveGap: 0.3, eclipseCorona: 1,
   ledDensity: 1, ledWaveSpeed: 1, ledCross: 1,
   laserSpread: 1, laserSpeed: 1, laserChaos: 0.6, laserMaxCount: 8,

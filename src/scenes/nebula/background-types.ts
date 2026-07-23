@@ -38,8 +38,10 @@ export interface BackgroundSettings {
   bgShowBodies: boolean  // 显示主体：true=把互斥隐藏的五路主体请回背景之上（星尘/歌词/歌名本就保留）
 }
 
+// 首启观感调优（2026-07-23 用户复调）：尘埃走「少而亮」——密度大降、粒径收小、亮度拉满，
+// 换取疏朗有呼吸的星野而非糊成一片；涟漪大幅收敛，让镜面拍点成为点缀而非主角
 export const DEFAULT_BACKGROUND_SETTINGS: BackgroundSettings =
-  { aurora: 1, ripple: 1, dust: 0.7, dustSize: 1, dustBright: 1, mirror: true, customBackgrounds: [], current: 'aurora', bgOpacity: 0.8, bgSaturation: 1, bgBreathe: true, bgShowBodies: false }
+  { aurora: 1, ripple: 0.2, dust: 0.15, dustSize: 0.6, dustBright: 2, mirror: true, customBackgrounds: [], current: 'aurora', bgOpacity: 0.8, bgSaturation: 1, bgBreathe: true, bgShowBodies: false }
 
 /** 滑块量程单一事实源：sanitize 与调音台共用（惯例同 CAMERA_LIMITS） */
 export const BACKGROUND_LIMITS = {

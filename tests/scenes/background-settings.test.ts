@@ -17,19 +17,21 @@ describe('sanitizeBackgroundSettings（惯例同 sanitizeLyricsSettings：坏数
     expect(s.dust).toBe(BACKGROUND_LIMITS.dust.min)
   })
   it('合法值原样保留；NaN/Infinity 回默认', () => {
+    // 未给出的字段一律回默认——引用常量而非字面量，调默认值不必改测试
     expect(sanitizeBackgroundSettings({ aurora: 0.3, ripple: 0, dust: 0.5, mirror: false }))
-      .toEqual({ aurora: 0.3, ripple: 0, dust: 0.5, dustSize: 1, dustBright: 1, mirror: false, customBackgrounds: [], current: 'aurora', bgOpacity: 0.8, bgSaturation: 1, bgBreathe: true, bgShowBodies: false })
+      .toEqual({ ...DEFAULT_BACKGROUND_SETTINGS, aurora: 0.3, ripple: 0, dust: 0.5, mirror: false })
     expect(sanitizeBackgroundSettings({ aurora: NaN, ripple: 0.5, dust: NaN }))
       .toEqual({ ...DEFAULT_BACKGROUND_SETTINGS, ripple: 0.5 })
   })
-  it('dustSize/dustBright（尘埃改造）：缺失回默认 1、出界钳 [0.5, 2.5]、坏类型回默认', () => {
-    expect(sanitizeBackgroundSettings({}).dustSize).toBe(1)
-    expect(sanitizeBackgroundSettings({}).dustBright).toBe(1)
+  it('dustSize/dustBright（尘埃改造）：缺失回默认、出界钳 [0.5, 2.5]、坏类型回默认', () => {
+    const d = DEFAULT_BACKGROUND_SETTINGS
+    expect(sanitizeBackgroundSettings({}).dustSize).toBe(d.dustSize)
+    expect(sanitizeBackgroundSettings({}).dustBright).toBe(d.dustBright)
     const s = sanitizeBackgroundSettings({ dustSize: 9, dustBright: -1 })
     expect(s.dustSize).toBe(BACKGROUND_LIMITS.dustSize.max)
     expect(s.dustBright).toBe(BACKGROUND_LIMITS.dustBright.min)
     expect(sanitizeBackgroundSettings({ dustSize: 'x', dustBright: NaN }))
-      .toMatchObject({ dustSize: 1, dustBright: 1 })
+      .toMatchObject({ dustSize: d.dustSize, dustBright: d.dustBright })
   })
   // 亲验 fb1 修订②（用户拍板「上移贴镜」）：-3.4 → -2.2。静默态运动包络顶 mix(1.6,2.7,0)=1.6 +
   // 弹性脉冲 0.6 = 2.2，恰好不穿面；新阈值钉死在这条理性上，而非旧的「顶 2.7+0.6」全量高能包络
