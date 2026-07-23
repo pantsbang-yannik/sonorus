@@ -1,5 +1,5 @@
 // 设置的主进程副作用（M4 设计 2.4：主进程侧项直接应用）。纯决策函数，electron API 经 deps 注入。
-import type { SonorusSettings } from './settings'
+import type { AudelyraSettings } from './settings'
 
 export interface EffectsDeps {
   setLoginItem: (open: boolean) => void
@@ -12,8 +12,8 @@ export interface EffectsDeps {
  * 返回新的 powerSaveBlocker id（null=未阻止休眠）——调用方持有并在下次传回。
  */
 export function applySettingsEffects(
-  prev: SonorusSettings | null,
-  next: SonorusSettings,
+  prev: AudelyraSettings | null,
+  next: AudelyraSettings,
   blockerId: number | null,
   deps: EffectsDeps
 ): number | null {

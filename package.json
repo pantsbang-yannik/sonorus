@@ -1,9 +1,10 @@
 {
-  "name": "sonorus",
+  "name": "audelyra",
   "version": "0.1.0",
-  "description": "Sonorus — 让声音显形",
+  "description": "Audelyra — 让声音显形",
   "main": "./out/main/main.js",
   "scripts": {
+    "predev": "test -x native/mac-tap/audelyra-tap || bash native/mac-tap/build.sh",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "test": "vitest run",
@@ -12,7 +13,7 @@
     "bake:demo-shapes": "node scripts/bake-shape-points.mjs assets/shapes-src/demo-gramophone/gramophone/scene.gltf assets/shapes/demo-gramophone 'https://sketchfab.com/3d-models/gramophone-2458f980cf584c45a130df3fc39d47ff' 'CC-BY-4.0' 450000 && node scripts/bake-shape-points.mjs assets/shapes-src/demo-cassette/sony_cassette/scene.gltf assets/shapes/demo-cassette 'https://sketchfab.com/3d-models/sony-cassette-0bdcf9e02a8a4abd8ef61f21fdddd119' 'CC-BY-4.0' 450000 'z90,x90' && node scripts/bake-shape-points.mjs assets/shapes-src/demo-headphones/headphones/scene.gltf assets/shapes/demo-headphones 'https://sketchfab.com/3d-models/headphones-9787e82ab3f441ac874490ecf369980b' 'CC-BY-4.0' 450000 && node scripts/bake-shape-points.mjs assets/shapes-src/demo-mic/shure_super_55/scene.gltf assets/shapes/demo-mic 'https://sketchfab.com/3d-models/shure-super-55-fac08019fef5474189f965bb495771eb' 'CC-BY-4.0' 450000",
     "gen:demo-trace": "node scripts/gen-demo-trace.mjs",
     "gen:demo-audio": "vite-node scripts/gen-demo-trace-from-audio.ts",
-    "predist": "test -x native/mac-tap/sonorus-tap || bash native/mac-tap/build.sh",
+    "predist": "test -x native/mac-tap/audelyra-tap || bash native/mac-tap/build.sh",
     "dist": "npm run build && bash scripts/make-icns.sh && electron-builder --config electron-builder.yml"
   },
   "author": "Yannik",

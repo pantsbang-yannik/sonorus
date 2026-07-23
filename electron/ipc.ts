@@ -9,7 +9,7 @@ import { parseShapeAssetMeta, resolveShapeAssetPath, resolveShapeMetaPath } from
 import { saveCustomShapePng, readCustomShapePng, deleteCustomShapePng, convertToPngViaSips } from './custom-shapes'
 import { saveCustomBackgroundJpeg, readCustomBackgroundJpeg, deleteCustomBackground, saveCustomBackgroundVideoFromPath, saveCustomBackgroundThumb, readCustomBackgroundThumb } from './custom-backgrounds'
 import { safeArtworkPath, readPlayRecords } from './history'
-import type { SettingsStore, SonorusSettings } from './settings'
+import type { SettingsStore, AudelyraSettings } from './settings'
 import type { WindowManager, WindowMode } from './windows'
 
 const MODES: readonly string[] = ['fullscreen', 'windowed']
@@ -28,7 +28,7 @@ export function wireIpc(store: SettingsStore, wm: WindowManager, hooks: IpcHooks
   ipcMain.handle('settings:get', () => store.get())
   // 版本号展示（发布准备② fb1：设置面板版本行）；更新检查动作在 main.ts 更新装配块（需 runUpdateCheck 状态）
   ipcMain.handle('app:getVersion', () => app.getVersion())
-  ipcMain.on('settings:set', (_e, patch: Partial<SonorusSettings>) => {
+  ipcMain.on('settings:set', (_e, patch: Partial<AudelyraSettings>) => {
     store.set(patch ?? {}) // set 内部 sanitize 全量校验，垃圾 patch 不会污染
   })
   ipcMain.handle('window:getMode', () => wm.getMode())
@@ -41,7 +41,7 @@ export function wireIpc(store: SettingsStore, wm: WindowManager, hooks: IpcHooks
   // 下载夹落盘（#6 海报 / #8 Drop 视频共用）：文件名渲染层已清洗，basename 兜底防路径穿越（纵深，
   // 同 shape 白名单哲学）；同秒同歌名连拍不覆盖（双审①P4）——存在则补序号
   const saveToDownloads = async (rawName: unknown, ext: 'png' | 'mp4' | 'txt', bytes: Uint8Array): Promise<{ ok: true; path: string }> => {
-    let name = basename(String(rawName ?? '') || `Sonorus.${ext}`)
+    let name = basename(String(rawName ?? '') || `Audelyra.${ext}`)
     if (!name.endsWith(`.${ext}`)) name += `.${ext}` // 纵深：无后缀名会让补序号 replace 空转死循环
     const extRe = new RegExp(`\\.${ext}$`)
     let file = join(app.getPath('downloads'), name)
@@ -56,7 +56,7 @@ export function wireIpc(store: SettingsStore, wm: WindowManager, hooks: IpcHooks
     const d = new Date()
     const p2 = (n: number): string => String(n).padStart(2, '0')
     const stamp = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}-${p2(d.getHours())}${p2(d.getMinutes())}${p2(d.getSeconds())}`
-    return saveToDownloads(`Sonorus-诊断-${stamp}.txt`, 'txt', Buffer.from(hooks.buildDiagnostics(), 'utf8'))
+    return saveToDownloads(`Audelyra-诊断-${stamp}.txt`, 'txt', Buffer.from(hooks.buildDiagnostics(), 'utf8'))
   })
   // 渲染层诊断事件（WebGPU 初始化失败/未捕获错误）：fire-and-forget，载荷不可信——钳长在 hooks 侧统一做
   ipcMain.on('diag:event', (_e, p: unknown) => {

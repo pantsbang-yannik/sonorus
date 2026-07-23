@@ -14,7 +14,7 @@
 
 ### 概念对照表（它 ↔ 我们）
 
-| morph-particles | Sonorus 等价物 | 备注 |
+| morph-particles | Audelyra 等价物 | 备注 |
 |---|---|---|
 | 每形状一张 DATA texture | `targets` storage buffer + `setTargets(cloud)` | 我们只存「当前目标」，切换时整体重写——等价且更省显存 |
 | uScroll 分段选形状对 | `ShapeSettings.current` + 仲裁 resolveShape | 它是滚动驱动连续插值，我们是事件驱动切换 |
@@ -57,7 +57,7 @@ pos = mix(shapeA, shapeB, smooth(t))   // 有的粒子先启程/先到站
 
 ## 三、反面结论（明确不借的）
 
-- **不换插值架构**：它的粒子不受音乐/流场/鼓点影响——那是我们的命根子。Sonorus 的果断感由「切换窗口内冲量 + 临时高刚度」在物理框架内实现（B1-fb3），律动零损失。
+- **不换插值架构**：它的粒子不受音乐/流场/鼓点影响——那是我们的命根子。Audelyra 的果断感由「切换窗口内冲量 + 临时高刚度」在物理框架内实现（B1-fb3），律动零损失。
 - **不引入 FBO/数据贴图多形状常驻**：我们事件驱动切换 + (id,count) 记忆化已等价，常驻 N 张贴图是它滚动连续插值才需要的。
 
 ## 四、落地状态

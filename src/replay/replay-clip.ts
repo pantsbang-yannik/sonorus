@@ -95,5 +95,5 @@ export function replayFilename(title: string, now: Date): string {
   const safe = title.replace(/[/\\:*?"<>|]/g, '_').trim().slice(0, 80) || 'untitled'
   const p = (n: number): string => String(n).padStart(2, '0')
   const stamp = `${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}-${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}`
-  return `Sonorus-Drop-${safe}-${stamp}.mp4`
+  return `Audelyra-Drop-${safe}-${stamp}.mp4`
 }

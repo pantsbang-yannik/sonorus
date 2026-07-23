@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SonorusEngine } from '../src/engine/engine'
+import { AudelyraEngine } from '../src/engine/engine'
 import { TraceRecorder } from '../src/engine/trace'
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..')
@@ -32,7 +32,7 @@ function decodeF32(input: string, args: string[] = []): Float32Array {
 
 /** 喂引擎收 (t, energy) 曲线或完整 trace */
 function runEngine(pcm: Float32Array, record: boolean): { energies: Array<{ t: number; e: number }>; trace: string } {
-  const engine = new SonorusEngine()
+  const engine = new AudelyraEngine()
   const energies: Array<{ t: number; e: number }> = []
   const recorder = new TraceRecorder()
   if (record) recorder.start(engine.bus)

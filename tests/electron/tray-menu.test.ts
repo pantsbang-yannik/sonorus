@@ -7,7 +7,7 @@ const actions: TrayActions = { onShowHide: noop, onFullscreen: noop, onWindowed:
 describe('buildTrayMenuTemplate', () => {
   it('包含全部菜单项：显隐/全屏/退出全屏/设置/检查更新/退出', () => {
     const labels = buildTrayMenuTemplate('fullscreen', actions).filter((i) => i.label).map((i) => i.label)
-    expect(labels).toEqual(['显示 / 隐藏', '全屏', '退出全屏', '设置…', '检查更新…', '退出 Sonorus'])
+    expect(labels).toEqual(['显示 / 隐藏', '全屏', '退出全屏', '设置…', '检查更新…', '退出 Audelyra'])
   })
 
   it('当前模式对应项禁用（全屏态禁全屏项启用退出全屏项，普通窗反之）', () => {

@@ -8,7 +8,7 @@ import { resolveCustomBackgroundFile, parseByteRange } from './custom-background
 import { startMacTap, type MacTapEvents } from './capture/mac-tap'
 import { startMacNowPlaying, resolveBinary } from './nowplaying/mac'
 import { resolveArtworkMime } from './nowplaying/artwork'
-import { SettingsStore, type SonorusSettings, type WinBounds } from './settings'
+import { SettingsStore, type AudelyraSettings, type WinBounds } from './settings'
 import { WindowManager, type WinAdapter } from './windows'
 import { createTray } from './tray'
 import { applySettingsEffects } from './effects'
@@ -110,19 +110,19 @@ function createWinAdapter(w: BrowserWindow): WinAdapter {
 // standard+secure 缺一不可（亲验黑屏第二根因）：非 standard 的自定义 scheme 在渲染层不被当
 // 正经资源源，<video> 判 SRC_NOT_SUPPORTED、fetch 直接 Failed——仅 stream:true 不够
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'sonorus-bg', privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
+  { scheme: 'audelyra-bg', privileges: { standard: true, secure: true, stream: true, supportFetchAPI: true, corsEnabled: true } },
 ])
 
 app.whenReady().then(() => {
   // store 提前到建窗之前（亲验 fb7）：普通窗启动要在创建时就恢复记忆的 bounds，免得先默认后跳位
   const store = new SettingsStore(join(app.getPath('userData'), 'settings.json'))
 
-  // sonorus-bg://<uuid> → userData/backgrounds/ 流式读（图片/视频通吃；v1 的 IPC 字节路线不动）。
+  // audelyra-bg://<uuid> → userData/backgrounds/ 流式读（图片/视频通吃；v1 的 IPC 字节路线不动）。
   // uuid 白名单在 resolve 内（非法/缺文件回 null → 404）。range 语义手工实现（亲验黑屏根治）：
   // net.fetch(file://) 会无视 Range 头回 200 无长度流，mp4 在媒体栈直接判 SRC_NOT_SUPPORTED——
   // 必须 stat 出总长、按 parseByteRange 回 206+Content-Range，fs 流切片零内存过手
   const backgroundsDir = join(app.getPath('userData'), 'backgrounds')
-  protocol.handle('sonorus-bg', async (req) => {
+  protocol.handle('audelyra-bg', async (req) => {
     try {
       const id = new URL(req.url).hostname
       const f = await resolveCustomBackgroundFile(backgroundsDir, id)
@@ -155,7 +155,7 @@ app.whenReady().then(() => {
       })
     } catch (e) {
       // resolve/stat/流建立之间文件被删等意外——不吃异常，留日志否则打包版排障无从下手
-      console.warn('[sonorus-bg] 协议请求失败', e)
+      console.warn('[audelyra-bg] 协议请求失败', e)
       return new Response('error', { status: 500 })
     }
   })
@@ -304,7 +304,7 @@ app.whenReady().then(() => {
     stopPowerBlocker: (id: number) => powerSaveBlocker.stop(id)
   }
   blockerId = applySettingsEffects(null, store.get(), blockerId, effectsDeps)
-  let prevSettings: SonorusSettings = store.get()
+  let prevSettings: AudelyraSettings = store.get()
   store.subscribe((s) => {
     blockerId = applySettingsEffects(prevSettings, s, blockerId, effectsDeps)
     prevSettings = s

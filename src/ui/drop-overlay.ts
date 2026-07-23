@@ -1,6 +1,6 @@
 // 全窗口拖放遮罩（idea #12 Task 7）：拖图到窗口任意处即可创建自定义形状——纯视觉反馈层，
 // 真正的 drop 处理挂在 window（capture），遮罩本身 pointer-events: none（铁律：不放可点元素）。
-// root 挂 parent（main.ts 传 #sonorus-overlay，仓库惯例 UI 全在 overlayDiv）：z-index 9996 在
+// root 挂 parent（main.ts 传 #audelyra-overlay，仓库惯例 UI 全在 overlayDiv）：z-index 9996 在
 // overlayDiv 内部与轻提示（9997/9999）正确排序——拖拽中 toast 仍在遮罩之上，不会被暗幕盖住。
 const FONT = `-apple-system, "PingFang SC", sans-serif`
 

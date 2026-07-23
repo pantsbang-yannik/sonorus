@@ -18,8 +18,8 @@ export interface MacTapEvents {
 
 export function startMacTap(events: MacTapEvents): () => void {
   const binPath = app.isPackaged
-    ? join(process.resourcesPath, 'sonorus-tap')
-    : join(app.getAppPath(), 'native/mac-tap/sonorus-tap')
+    ? join(process.resourcesPath, 'audelyra-tap')
+    : join(app.getAppPath(), 'native/mac-tap/audelyra-tap')
 
   if (!existsSync(binPath)) {
     events.onError?.(`tap 二进制不存在: ${binPath}`)

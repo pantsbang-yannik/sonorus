@@ -48,7 +48,7 @@
 
 ## 亲验实锤补充（2026-07-22 真实 mp4 全黑排障结论——三层根因，缺一即黑）
 
-探针只验了 MediaRecorder 自生成 webm（软解帧+blob URL 同源），真实 H.264 mp4 走 sonorus-bg:// 协议时三层全断：
+探针只验了 MediaRecorder 自生成 webm（软解帧+blob URL 同源），真实 H.264 mp4 走 audelyra-bg:// 协议时三层全断：
 
 1. **scheme 特权不足**：仅 `stream: true` 时，非 standard scheme 在渲染层不被当合法媒体源——`<video>` 直接 `MEDIA_ERR_SRC_NOT_SUPPORTED`，fetch 也 `Failed to fetch`。必须 `{ standard: true, secure: true, stream: true, supportFetchAPI: true, corsEnabled: true }` 全家桶。
 2. **net.fetch(file://) 无视 Range 头**：回 200 无 Content-Length 分块流，mp4 在媒体栈判不可用。协议 handler 必须手工实现 range 语义（stat 总长 + parseByteRange 纯函数 + 206/Content-Range/Content-Length + fs.createReadStream 切片流）。修后可观测到媒体栈发中段 range 寻址请求。

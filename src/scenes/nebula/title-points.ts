@@ -1,4 +1,4 @@
-// 文字→粒子点云（切歌拼字，spec 2026-07-12-sonorus-particle-title-design §5.2）。
+// 文字→粒子点云（切歌拼字，spec 2026-07-12-audelyra-particle-title-design §5.2）。
 // 与封面同一套路：像素源→采样点云。renderTitleImage 是 DOM 画布部分（node 单测不覆盖，
 // 返回 null 的降级路径由场景侧 cancel 兜底）；sampleTitlePoints 是纯函数（可测）。
 import { hash01, type PixelSource, type ShapePointCloud } from './cover-points'

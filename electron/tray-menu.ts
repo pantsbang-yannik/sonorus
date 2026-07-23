@@ -28,6 +28,6 @@ export function buildTrayMenuTemplate(mode: WindowMode, a: TrayActions): TrayMen
     { label: '设置…', click: a.onSettings },
     { label: '检查更新…', click: a.onCheckUpdate },
     { type: 'separator' },
-    { label: '退出 Sonorus', click: a.onQuit }
+    { label: '退出 Audelyra', click: a.onQuit }
   ]
 }

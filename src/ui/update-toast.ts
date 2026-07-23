@@ -150,7 +150,7 @@ export class UpdateNotice {
 
   private showCard(): void {
     const m = this.manifest!
-    this.cardTitle.textContent = `Sonorus ${m.version} 已发布`
+    this.cardTitle.textContent = `Audelyra ${m.version} 已发布`
     this.cardNotes.textContent = m.notes ?? ''
     this.cardNotes.style.display = m.notes ? 'block' : 'none'
     this.cardMirrorBtn.style.display = m.mirrorUrl ? 'inline' : 'none'

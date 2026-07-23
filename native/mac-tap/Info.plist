@@ -3,12 +3,12 @@
 <plist version="1.0">
 <dict>
   <key>CFBundleIdentifier</key>
-  <string>com.sonorus.tap</string>
+  <string>com.audelyra.tap</string>
   <key>CFBundleName</key>
-  <string>SonorusTap</string>
+  <string>AudelyraTap</string>
   <key>CFBundleExecutable</key>
-  <string>sonorus-tap</string>
+  <string>audelyra-tap</string>
   <key>NSAudioCaptureUsageDescription</key>
-  <string>Sonorus needs to capture system audio to visualize it.</string>
+  <string>Audelyra needs to capture system audio to visualize it.</string>
 </dict>
 </plist>

@@ -59,10 +59,10 @@ export class UserBackdrop {
     this.mesh.visible = false // 贴图就绪前不画：防未初始化材质闪帧
   }
 
-  /** 读源→解码→换贴图→重置淡入。kind 判别两路：图片走 v1 IPC 字节，视频走 sonorus-bg 流式。
+  /** 读源→解码→换贴图→重置淡入。kind 判别两路：图片走 v1 IPC 字节，视频走 audelyra-bg 流式。
    * false = 失败或已被更新的 show 替代（调用侧据此回落极光） */
   async show(id: string, kind: 'image' | 'video' = 'image'): Promise<boolean> {
-    if (kind === 'video') return this.showVideoUrl(`sonorus-bg://${id}`)
+    if (kind === 'video') return this.showVideoUrl(`audelyra-bg://${id}`)
     const myGen = ++this.gen
     if (!fetchBackground) return false
     try {

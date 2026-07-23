@@ -21,7 +21,7 @@
 - **RMS 证据**：本自动化会话内 **rms = 0.0**（全零），因无法在会话内完成 TCC 人工授权（见坑）。管道结构正确性由字节率与 header 佐证；非零 RMS 待人工授权后由 `verify.sh` 复核。
 
 - **坑（如实记录）**：
-  1. **授权归属 = 宿主 App，不是本二进制**。CLI 二进制 `sonorus-tap` 未注册为已知 App（`tccutil reset AudioCapture com.sonorus.tap` 报 `No such bundle identifier -10814`），TCC 决策归属运行它的终端（本机为 iTerm，bundle id `com.googlecode.iterm2`）。生产中归属 Electron.app。
+  1. **授权归属 = 宿主 App，不是本二进制**。CLI 二进制 `audelyra-tap` 未注册为已知 App（`tccutil reset AudioCapture com.audelyra.tap` 报 `No such bundle identifier -10814`），TCC 决策归属运行它的终端（本机为 iTerm，bundle id `com.googlecode.iterm2`）。生产中归属 Electron.app。
   2. **未授权 = 静音而非报错**。`AudioHardwareCreateProcessTap` / 聚合设备创建 / IO 回调全部成功返回 `noErr`，但 PCM 全零。不能靠 OSStatus 判断是否授权，必须靠 RMS/内容判定。
   3. **必须内嵌 Info.plist**。裸 `swiftc` 产物无法让系统正确归属授权提示。build.sh 用 `-Xlinker -sectcreate __TEXT __info_plist` 内嵌带 `NSAudioCaptureUsageDescription` + `CFBundleIdentifier` 的 Info.plist，并 `codesign --force --sign -` 重新 adhoc 签名覆盖。
   4. **本会话 `log show` 完全不可用**（`log show --last 1m` 返回 0 行，权限受限），无法用系统日志诊断 TCC 弹窗是否出现；只能靠 RMS 结果反推。
@@ -70,15 +70,15 @@
   ```
   实测事件序列（播放 A → 切到 B → 杀掉 Music）：
   ```
-  [0.0s] change title="Sonorus Covr Test" artist="Covr Artist" artwork=857B
-  [5.3s] change title="Sonorus Art Test" artist="Spike Artist" artwork=null
-  [5.3s] change title="Sonorus Art Test" artist="Spike Artist" artwork=857B   ← 封面异步补发
+  [0.0s] change title="Audelyra Covr Test" artist="Covr Artist" artwork=857B
+  [5.3s] change title="Audelyra Art Test" artist="Spike Artist" artwork=null
+  [5.3s] change title="Audelyra Art Test" artist="Spike Artist" artwork=857B   ← 封面异步补发
   [13.3s] unknown                                                             ← 会话消失
   ```
 
 - **坑（如实记录）**：
   1. **brief 里的层①「npm 包」不存在**——media-control 从未发布到 npm，别再试 `npm install media-control`。生产分发要么依赖用户 `brew install`，要么后续把 mediaremote-adapter 的 framework + perl 宿主打包进 app（Task 10+ 决策点）。
-  2. **Electron GUI 进程的 PATH 不含 `/opt/homebrew/bin`**。`mac.ts` 已按绝对路径解析二进制（`SONORUS_MEDIA_CONTROL` 环境变量 > `/opt/homebrew/bin` > `/usr/local/bin` > PATH 兜底）。
+  2. **Electron GUI 进程的 PATH 不含 `/opt/homebrew/bin`**。`mac.ts` 已按绝对路径解析二进制（`AUDELYRA_MEDIA_CONTROL` 环境变量 > `/opt/homebrew/bin` > `/usr/local/bin` > PATH 兜底）。
   3. **封面字节不保证是 PNG**（见上，实测 JPEG）。类型契约字段名 `artworkPng` 保持不变（Task 10 依赖签名），但消费端不要假设 PNG 魔数。
   4. **每条带封面的推送体积可达数百 KB**（base64）。若未来只要文字不要图，加 `--no-artwork` 可大幅减流。
   5. **AppleScript 备胎并不「更简单」**：需要「自动化」TCC 授权（会无限挂起等真人点击），且 per-App、无推送、无封面字节（Music 的 artwork 要另取）。MediaRemote 路线反而**零 TCC 弹窗**——本会话全程无需任何授权。
@@ -118,5 +118,5 @@
 - **信号总线实测更新率**：46.875Hz（hop=1024 样本 @48kHz ≈ 21.3ms）——设计文档"60Hz"已修订为实测值
 - **Signals 契约版本**：`src/engine/types.ts@a018196`（v1 体力信号全量：loudness/bands/spectrum/beat/bpm/energy/drop/silence）
 - **封面可得性实测**：Music.app＝有（base64 字节，实测 JPEG，可能晚 title 数秒异步补发，带封面推送可达数百 KB）；Spotify＝未实测（本机未装，系统层 MediaRemote 预期覆盖）；浏览器＝未实测
-- **CPU/内存基线**（dev 未优化构建，播放 30s 测试音期间 3 次采样，Apple Silicon）：主进程 2–3.5%、渲染进程 4–6%（含引擎分析+canvas 绘制）、GPU helper 5–6%、sonorus-tap sidecar 0.2–0.3%，合计约 12–16% 单核；渲染进程 RSS ≈ 112MB。注：未确认采样时 TCC 授权态（未授权=全零 PCM，计算路径与真实音频相同，基线仍有效）
+- **CPU/内存基线**（dev 未优化构建，播放 30s 测试音期间 3 次采样，Apple Silicon）：主进程 2–3.5%、渲染进程 4–6%（含引擎分析+canvas 绘制）、GPU helper 5–6%、audelyra-tap sidecar 0.2–0.3%，合计约 12–16% 单核；渲染进程 RSS ≈ 112MB。注：未确认采样时 TCC 授权态（未授权=全零 PCM，计算路径与真实音频相同，基线仍有效）
 - **已知延迟（估算，未实测对齐）**：sidecar IO 回调即写 stdout（写队列异步，不阻塞音频线程）→ 主进程按 2048 样本/通道切块 ≈43ms 聚齐 → 引擎 hop ≈21ms → 端到端约 65–90ms + IPC/渲染一帧。人工验收"鼓点白闪与听感对齐"即此项的体感验证

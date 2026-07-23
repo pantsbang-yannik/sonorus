@@ -57,7 +57,7 @@ export class DropChoice {
       pointer-events: auto;
     `
     this.container.style.display = 'none' // 被测样式显式属性写（FakeEl 不解析 cssText）
-    // #sonorus-overlay 根容器是 pointer-events:none（点击穿透到画布），可交互组件必须自己开回来
+    // #audelyra-overlay 根容器是 pointer-events:none（点击穿透到画布），可交互组件必须自己开回来
     // （shape-picker 同款纪律）。漏掉此行=整个浮层点击穿透：点按钮命中画布→触发点外部关闭，
     // 回调永不执行且外观像"选择成功"（亲验实锤的静默失效，fake DOM 测不出 CSS 穿透语义）
     this.container.style.pointerEvents = 'auto'

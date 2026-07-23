@@ -1,5 +1,5 @@
 #!/bin/bash
-# One-shot real-machine verifier for sonorus-tap.
+# One-shot real-machine verifier for audelyra-tap.
 # Generates a 440Hz test tone, plays it while capturing system audio,
 # then computes RMS + 440Hz spectral power over the captured PCM.
 #
@@ -11,7 +11,7 @@
 
 set -e
 cd "$(dirname "$0")"
-BIN="./sonorus-tap"
+BIN="./audelyra-tap"
 [ -x "$BIN" ] && [ -f "$BIN" ] || { echo "build first: ./build.sh"; exit 1; }
 
 TMP="$(mktemp -d)"

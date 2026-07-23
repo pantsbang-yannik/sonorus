@@ -92,7 +92,7 @@ export function renderDiagnostics(opts: {
   homeDir?: string
 }): string {
   const text = [
-    'Sonorus 诊断报告',
+    'Audelyra 诊断报告',
     `生成时间: ${opts.generatedAt.toISOString()}`,
     '说明: 本报告在本机生成，仅当你主动分享才会离开设备；内容可能含本机文件路径（主目录已缩写为 ~）。',
     '',

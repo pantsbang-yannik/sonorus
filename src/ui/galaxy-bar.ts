@@ -1,5 +1,5 @@
 // galaxy-bar.ts —— 星系图鉴顶部时间筛选条：全部/最近7天/最近30天 chips + 空态文案 + 周年提示。
-// 挂 parent（#sonorus-overlay 铁律）；top:64 避开 28px 拖拽区（fb2 铁律：拖拽区内不许放可点元素），
+// 挂 parent（#audelyra-overlay 铁律）；top:64 避开 28px 拖拽区（fb2 铁律：拖拽区内不许放可点元素），
 // 与海报 savedToast 短暂重叠可接受（亲验点）。显隐/色值家族同操作坞（500ms 过渡、0.95/0.45 选中态）。
 import type { GalaxyFilter } from '../scenes/nebula/galaxy/types'
 

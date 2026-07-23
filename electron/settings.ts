@@ -30,7 +30,7 @@ export function sanitizeUpdateCheck(v: unknown): UpdateCheckSettings {
 /** 普通窗的记忆大小/位置；null = 从未记忆过，首次用默认尺寸（=启动尺寸）并居中（两态模型拍板 2026-07-06） */
 export interface WinBounds { x: number; y: number; width: number; height: number }
 
-export interface SonorusSettings {
+export interface AudelyraSettings {
   tier: TierSetting
   title: TitleSettings          // ← 粒子歌名（原切歌拼字）：模式 off/timed/always + 位置/大小/亮度
   launchAtLogin: boolean
@@ -46,7 +46,7 @@ export interface SonorusSettings {
   updateCheck: UpdateCheckSettings // ← 发布准备②：自动检查更新开关 + 跳过版本记账
 }
 
-export const DEFAULT_SETTINGS: SonorusSettings = {
+export const DEFAULT_SETTINGS: AudelyraSettings = {
   tier: 'auto',
   title: DEFAULT_TITLE_SETTINGS,
   launchAtLogin: false,
@@ -78,7 +78,7 @@ function sanitizeWinBounds(v: unknown): WinBounds | null {
 }
 
 /** 逐字段校验：非法/缺失字段回退默认值（设置文件损坏不崩，M4 设计第 8 节），多余字段丢弃 */
-export function sanitizeSettings(raw: unknown): SonorusSettings {
+export function sanitizeSettings(raw: unknown): AudelyraSettings {
   const r = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>
   const bool = (v: unknown, d: boolean): boolean => (typeof v === 'boolean' ? v : d)
   return {
@@ -100,14 +100,14 @@ export function sanitizeSettings(raw: unknown): SonorusSettings {
 }
 
 export class SettingsStore {
-  private current: SonorusSettings
-  private listeners: Array<(s: SonorusSettings) => void> = []
+  private current: AudelyraSettings
+  private listeners: Array<(s: AudelyraSettings) => void> = []
 
   constructor(private filePath: string) {
     this.current = this.load()
   }
 
-  get(): SonorusSettings {
+  get(): AudelyraSettings {
     // winBounds/mapping 是嵌套对象，浅拷贝也要防外部改动污染内部状态；mapping 更深一层，用 JSON 往返深拷贝
     return {
       ...this.current,
@@ -126,11 +126,11 @@ export class SettingsStore {
   /** patch 合并 → 全量校验 → 原子落盘 → 通知订阅者
    * winBounds/mapping/shape 每次 sanitize 都会生成新对象引用，逐键 !== 比较对它们必然误判为"变了"——
    * 这些对象字段改按值比较（JSON），其余标量字段仍用 !== */
-  set(patch: Partial<SonorusSettings>): SonorusSettings {
+  set(patch: Partial<AudelyraSettings>): AudelyraSettings {
     const next = sanitizeSettings({ ...this.current, ...patch })
     // shape 与 winBounds/mapping 同罪：sanitize 每次生成新引用，逐键 !== 必然误判（评审 I4）
-    const OBJECT_KEYS = new Set<keyof SonorusSettings>(['winBounds', 'mapping', 'shape', 'motion', 'camera', 'title', 'lyrics', 'background', 'updateCheck'])
-    const changed = (Object.keys(next) as Array<keyof SonorusSettings>).some((k) => {
+    const OBJECT_KEYS = new Set<keyof AudelyraSettings>(['winBounds', 'mapping', 'shape', 'motion', 'camera', 'title', 'lyrics', 'background', 'updateCheck'])
+    const changed = (Object.keys(next) as Array<keyof AudelyraSettings>).some((k) => {
       if (OBJECT_KEYS.has(k)) return JSON.stringify(next[k]) !== JSON.stringify(this.current[k])
       return next[k] !== this.current[k]
     })
@@ -141,14 +141,14 @@ export class SettingsStore {
     return this.get()
   }
 
-  subscribe(l: (s: SonorusSettings) => void): () => void {
+  subscribe(l: (s: AudelyraSettings) => void): () => void {
     this.listeners.push(l)
     return () => {
       this.listeners = this.listeners.filter((x) => x !== l)
     }
   }
 
-  private load(): SonorusSettings {
+  private load(): AudelyraSettings {
     try {
       return sanitizeSettings(JSON.parse(readFileSync(this.filePath, 'utf8')))
     } catch {

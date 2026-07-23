@@ -190,7 +190,7 @@ export class ReplayRecorder {
     else this.state = 'unavailable'
   }
 
-  /** 角标烧进帧（spec 拍板"轻量角标"）：左下 歌名·歌手，右下 Sonorus；字号随录制高度，阴影保深浅背景可读 */
+  /** 角标烧进帧（spec 拍板"轻量角标"）：左下 歌名·歌手，右下 Audelyra；字号随录制高度，阴影保深浅背景可读 */
   private drawBadge(w: number, h: number): void {
     const meta = this.deps.getMeta()
     const pad = Math.round(h * 0.033)
@@ -208,7 +208,7 @@ export class ReplayRecorder {
       ctx.fillText(label, pad, h - pad, Math.round(w * 0.6)) // maxWidth 压扁超长歌名而非溢出
     }
     ctx.textAlign = 'right'
-    ctx.fillText('Sonorus', w - pad, h - pad)
+    ctx.fillText('AUDELYRA', w - pad, h - pad)
     ctx.restore()
   }
 }

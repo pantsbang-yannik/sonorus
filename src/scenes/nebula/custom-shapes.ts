@@ -8,7 +8,7 @@ import type { CustomShapeMeta } from './shapes/types'
 
 export type CustomShapeFetcher = (id: string) => Promise<Uint8Array>
 
-// 注入模式同 contour.loadContourAssets：场景模块不直接摸 window.sonorus，main.ts 启动时接线
+// 注入模式同 contour.loadContourAssets：场景模块不直接摸 window.audelyra，main.ts 启动时接线
 let fetcher: CustomShapeFetcher | null = null
 export function setCustomShapeFetcher(f: CustomShapeFetcher): void {
   fetcher = f

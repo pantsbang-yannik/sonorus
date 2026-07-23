@@ -7,7 +7,7 @@ import { defaultRhythmPreset } from '../../src/scenes/nebula/mapping/spec'
 import { DEFAULT_LYRICS_SETTINGS } from '../../src/scenes/nebula/lyrics/lyrics-fx'
 import { DEFAULT_CAMERA_SETTINGS } from '../../src/scenes/nebula/camera-types'
 
-const tmpFile = (): string => join(mkdtempSync(join(tmpdir(), 'sonorus-settings-')), 'settings.json')
+const tmpFile = (): string => join(mkdtempSync(join(tmpdir(), 'audelyra-settings-')), 'settings.json')
 
 describe('sanitizeSettings', () => {
   it('非对象输入回退全默认', () => {

@@ -1,5 +1,5 @@
 // galaxy-card.ts —— 星系图鉴右侧信息卡：点选一颗星后展示曲目详情 + 可点播放日历。
-// 挂 parent（#sonorus-overlay 铁律）；样式家族同 savedToast（深底/毛玻璃/细边框），显隐过渡 500ms
+// 挂 parent（#audelyra-overlay 铁律）；样式家族同 savedToast（深底/毛玻璃/细边框），显隐过渡 500ms
 // 同 dock；Esc 关卡走 window capture + stopPropagation 先例（player-bar.ts），只在 isOpen 时
 // 消费，不连带关掉其它面板。关闭动作（Esc / × 按钮）只上报 deps.onClose，不自行 hide()——
 // 精确复刻 PlayerBar 关闭按钮的解耦惯例：真正隐藏交外部（T12）在收到回调后调用 hide()。

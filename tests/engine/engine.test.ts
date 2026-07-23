@@ -1,14 +1,14 @@
 import { describe, it, expect } from 'vitest'
-import { SonorusEngine } from '../../src/engine/engine'
+import { AudelyraEngine } from '../../src/engine/engine'
 import type { PcmFrame, Signals } from '../../src/engine/types'
 
 function frame(samples: Float32Array): PcmFrame {
   return { sampleRate: 48000, channels: 1, samples }
 }
 
-describe('SonorusEngine', () => {
+describe('AudelyraEngine', () => {
   it('喂入 1 秒 60Hz 正弦 → 收到 ~46 次信号，low 频段占优，无 drop', () => {
-    const engine = new SonorusEngine()
+    const engine = new AudelyraEngine()
     const received: Signals[] = []
     engine.bus.subscribe((s) => received.push(s))
 
@@ -27,7 +27,7 @@ describe('SonorusEngine', () => {
   })
 
   it('退订后不再收到信号', () => {
-    const engine = new SonorusEngine()
+    const engine = new AudelyraEngine()
     let count = 0
     const off = engine.bus.subscribe(() => count++)
     engine.ingest(frame(new Float32Array(2048)))

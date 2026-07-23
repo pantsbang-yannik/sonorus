@@ -127,7 +127,7 @@ export function runOnboarding(deps: OnboardingDeps): { dispose: () => void } {
   // ===== intro 幕：字标 + 副文案 + 唯一按钮「开始」=====
   const introScene = makeSceneWrapper()
   const title = document.createElement('div')
-  title.textContent = 'SONORUS'
+  title.textContent = 'AUDELYRA'
   title.style.cssText = `
     font-size: clamp(28px, 4vw, 44px);
     font-weight: 300;
@@ -164,7 +164,7 @@ export function runOnboarding(deps: OnboardingDeps): { dispose: () => void } {
   // ===== denied 幕：指引文案 + 「打开系统设置」「重试」=====
   const deniedScene = makeSceneWrapper()
   const deniedLine1 = document.createElement('div')
-  deniedLine1.textContent = 'Sonorus 需要「系统音频录制」权限'
+  deniedLine1.textContent = 'Audelyra 需要「系统音频录制」权限'
   deniedLine1.style.cssText = `
     font-size: 15px;
     font-weight: 300;
@@ -172,7 +172,7 @@ export function runOnboarding(deps: OnboardingDeps): { dispose: () => void } {
     color: rgba(255, 255, 255, 0.85);
   `
   const deniedLine2 = document.createElement('div')
-  deniedLine2.textContent = '系统设置 → 隐私与安全性 → 系统音频录制，打开 Sonorus'
+  deniedLine2.textContent = '系统设置 → 隐私与安全性 → 系统音频录制，打开 Audelyra'
   deniedLine2.style.cssText = `
     font-size: 12px;
     font-weight: 300;

@@ -81,7 +81,7 @@ describe('UpdateNotice 可选更新卡', () => {
     const card = byRole(parent, 'update-card')!
     expect(card.style.opacity).toBe('1')
     expect(card.style.pointerEvents).toBe('auto')
-    expect(byRole(parent, 'update-card-title')!.textContent).toBe('Sonorus 0.2.0 已发布')
+    expect(byRole(parent, 'update-card-title')!.textContent).toBe('Audelyra 0.2.0 已发布')
     expect(byRole(parent, 'update-card-notes')!.textContent).toBe('新增激光形态')
     expect(byRole(parent, 'update-forced')!.style.visibility).toBe('hidden')
   })

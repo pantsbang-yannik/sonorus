@@ -3,11 +3,11 @@
 import { sanitizeManifest, type UpdateManifest } from './protocol'
 
 /** latest.json 双源：raw.githubusercontent 主源 + jsDelivr CDN 备源（国内可达性）。
- * 地址烘死在包里改不了——公开仓 pantsbang-yannik/sonorus 一经分发不可更名/转私有
+ * 地址烘死在包里改不了——公开仓 pantsbang-yannik/audelyra 一经分发不可更名/转私有
  * （2026-07-22 拍板：v0.1.0 从未分发，撤销独立发布仓，改主流单仓模式：清单+DMG 全在公开代码仓） */
 export const LATEST_JSON_URLS: readonly string[] = [
-  'https://raw.githubusercontent.com/pantsbang-yannik/sonorus/main/latest.json',
-  'https://cdn.jsdelivr.net/gh/pantsbang-yannik/sonorus@main/latest.json'
+  'https://raw.githubusercontent.com/pantsbang-yannik/audelyra/main/latest.json',
+  'https://cdn.jsdelivr.net/gh/pantsbang-yannik/audelyra@main/latest.json'
 ]
 
 export const FETCH_TIMEOUT_MS = 8000

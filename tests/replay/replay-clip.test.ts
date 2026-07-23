@@ -114,13 +114,13 @@ describe('SizeSettler', () => {
 })
 
 describe('replayFilename', () => {
-  it('Sonorus-Drop 前缀 + 歌名清洗 + 秒级时间戳 + .mp4', () => {
+  it('Audelyra-Drop 前缀 + 歌名清洗 + 秒级时间戳 + .mp4', () => {
     const now = new Date(2026, 6, 16, 21, 5, 9)
-    expect(replayFilename('夜曲', now)).toBe('Sonorus-Drop-夜曲-20260716-210509.mp4')
+    expect(replayFilename('夜曲', now)).toBe('Audelyra-Drop-夜曲-20260716-210509.mp4')
   })
   it('非法字符替换、空名回落 untitled（同 posterFilename 口径）', () => {
     const now = new Date(2026, 6, 16, 21, 5, 9)
-    expect(replayFilename('a/b:c', now)).toBe('Sonorus-Drop-a_b_c-20260716-210509.mp4')
-    expect(replayFilename('', now)).toBe('Sonorus-Drop-untitled-20260716-210509.mp4')
+    expect(replayFilename('a/b:c', now)).toBe('Audelyra-Drop-a_b_c-20260716-210509.mp4')
+    expect(replayFilename('', now)).toBe('Audelyra-Drop-untitled-20260716-210509.mp4')
   })
 })

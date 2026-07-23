@@ -1,4 +1,4 @@
-// sonorus-tap: macOS system-audio capture sidecar (Core Audio Process Tap, macOS 14.2+)
+// audelyra-tap: macOS system-audio capture sidecar (Core Audio Process Tap, macOS 14.2+)
 // Protocol: stderr line 1 = {"sampleRate":<num>,"channels":<num>}, then stdout = interleaved Float32 LE PCM.
 // Exits on SIGTERM/SIGINT.
 
@@ -16,7 +16,7 @@ let tapDesc = CATapDescription(stereoGlobalTapButExcludeProcesses: [])
 tapDesc.uuid = UUID()
 tapDesc.muteBehavior = .unmuted
 tapDesc.isPrivate = true
-tapDesc.name = "SonorusTap"
+tapDesc.name = "AudelyraTap"
 
 var tapID = AudioObjectID(kAudioObjectUnknown)
 var status = AudioHardwareCreateProcessTap(tapDesc, &tapID)
@@ -48,7 +48,7 @@ let outputUID = readDefaultOutputUID()
 
 // 3) Private aggregate device containing the default output as sub-device + the tap
 let aggDict: [String: Any] = [
-  kAudioAggregateDeviceNameKey: "SonorusTap",
+  kAudioAggregateDeviceNameKey: "AudelyraTap",
   kAudioAggregateDeviceUIDKey: UUID().uuidString,
   kAudioAggregateDeviceMainSubDeviceKey: outputUID,
   kAudioAggregateDeviceIsPrivateKey: true,
@@ -81,7 +81,7 @@ FileHandle.standardError.write(
   "{\"sampleRate\":\(Int(asbd.mSampleRate)),\"channels\":\(asbd.mChannelsPerFrame)}\n".data(using: .utf8)!)
 
 // 4) IO callback: copy buffers on the audio thread, write to stdout on a separate queue
-let writeQueue = DispatchQueue(label: "sonorus.tap.write")
+let writeQueue = DispatchQueue(label: "audelyra.tap.write")
 var ioProcID: AudioDeviceIOProcID?
 status = AudioDeviceCreateIOProcIDWithBlock(&ioProcID, aggID, nil) { _, inData, _, _, _ in
   let abl = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: inData))

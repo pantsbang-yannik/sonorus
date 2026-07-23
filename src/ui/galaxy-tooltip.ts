@@ -1,5 +1,5 @@
 // galaxy-tooltip.ts —— 星系悬停信息条（fb2）：星上方浮现 歌名 + 歌手·听过N次。
-// 挂 parent（#sonorus-overlay 铁律）；pointer-events:none 不抢拾取；坐标由 director 逐帧上报（跟星走）。
+// 挂 parent（#audelyra-overlay 铁律）；pointer-events:none 不抢拾取；坐标由 director 逐帧上报（跟星走）。
 // 样式家族同 tooltip.ts（半透明深色 + backdrop-blur + opacity/blur 显影）——那是挂静态元素的
 // mouseenter 机制，这里是逐帧移动的 3D 星，机制不同故独立成类，视觉保持一家。
 const FONT = `-apple-system, "SF Pro Display", "PingFang SC", sans-serif`

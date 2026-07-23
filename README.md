@@ -1,10 +1,10 @@
-# Sonorus — 让声音显形
+# Audelyra — 让声音显形
 
-> Sonorus turns whatever is playing on your Mac into a living particle nebula.
+> Audelyra turns whatever is playing on your Mac into a living particle nebula.
 
-Sonorus 是一款 macOS 音乐可视化应用：监听系统正在播放的任何音乐（Apple Music、网易云、浏览器……），实时化作会呼吸的粒子星云——不挑播放器，不用导入，放歌即显形。
+Audelyra 是一款 macOS 音乐可视化应用：监听系统正在播放的任何音乐（Apple Music、网易云、浏览器……），实时化作会呼吸的粒子星云——不挑播放器，不用导入，放歌即显形。
 
-https://github.com/user-attachments/assets/6d1dbbff-465f-458d-bcf7-59de5e48db71
+https://github.com/user-attachments/assets/f387edf0-d041-4885-85bf-46f9fe34e4f1
 
 ## 功能
 
@@ -40,10 +40,10 @@ npm run dev
 
 系统要求：Apple Silicon Mac，macOS 14.2 及以上。
 
-1. 打开 DMG，把 Sonorus 拖入「应用程序」
-2. **首次启动：右键点击 Sonorus → 打开 → 再点「打开」**（应用暂未进行 Apple 公证，直接双击会被系统拦下）
+1. 打开 DMG，把 Audelyra 拖入「应用程序」
+2. **首次启动：右键点击 Audelyra → 打开 → 再点「打开」**（应用暂未进行 Apple 公证，直接双击会被系统拦下）
 3. 若系统提示「已损坏，无法打开」，在终端执行后重试：
-   `xattr -cr /Applications/Sonorus.app`
+   `xattr -cr /Applications/Audelyra.app`
 4. 首次可视化系统音频时，按系统弹窗授权「系统音频录制」；错过弹窗可到
    系统设置 → 隐私与安全性 → 系统音频录制 中手动开启
 
@@ -55,7 +55,7 @@ Electron · three.js（WebGPU/TSL）· meyda（音频特征）· WebCodecs（回
 
 ## 免责声明
 
-Sonorus 是独立项目，与 Apple、LRCLIB、网易云音乐及任何音乐平台**无隶属、授权或合作关系**。歌词数据来自 LRCLIB 与网易云音乐的公开接口，仅用于向用户实时展示其正在播放歌曲的歌词，本地缓存、不作任何再分发；该功能可在设置中完全关闭。所有商标归其各自所有者。
+Audelyra 是独立项目，与 Apple、LRCLIB、网易云音乐及任何音乐平台**无隶属、授权或合作关系**。歌词数据来自 LRCLIB 与网易云音乐的公开接口，仅用于向用户实时展示其正在播放歌曲的歌词，本地缓存、不作任何再分发；该功能可在设置中完全关闭。所有商标归其各自所有者。
 
 ## 第三方声明
 
@@ -74,14 +74,14 @@ Sonorus 是独立项目，与 Apple、LRCLIB、网易云音乐及任何音乐平
 
 **附加许可（GPL §7 additional permission）**：作为版权持有人，特此额外允许本程序与 [GSAP](https://gsap.com)（依其 Standard License 分发）链接并组合分发，组合作品中 GSAP 部分不受 GPL 条款约束。
 
-**商标声明**：GPL 协议仅覆盖代码。「Sonorus」名称与应用图标/标识**保留所有权利**——fork 与再分发的版本请使用自己的名称与图标，不得暗示与本项目官方相关。
+**商标声明**：GPL 协议仅覆盖代码。「Audelyra」名称与应用图标/标识**保留所有权利**——fork 与再分发的版本请使用自己的名称与图标，不得暗示与本项目官方相关。
 
 ## English
 
-**Sonorus** is a macOS music visualizer that turns whatever is playing on your Mac — Apple Music, Spotify, browser, anything — into a living particle nebula in real time. No importing, no player lock-in: just play music and watch it take shape. Features include lyric particles, custom shapes from your own images/text, local playback, a personal "galaxy" grown from your listening history, and one-key poster/replay export.
+**Audelyra** is a macOS music visualizer that turns whatever is playing on your Mac — Apple Music, Spotify, browser, anything — into a living particle nebula in real time. No importing, no player lock-in: just play music and watch it take shape. Features include lyric particles, custom shapes from your own images/text, local playback, a personal "galaxy" grown from your listening history, and one-key poster/replay export.
 
 Built with Electron, three.js (WebGPU/TSL), meyda, WebCodecs, and a native Swift audio tap. Requires an Apple Silicon Mac on macOS 14.2+. To run from source: `brew install media-control && npm install && npm run dev` (Node.js ≥ 20).
 
 **Privacy**: audio capture and analysis never leave your machine. The only network requests are lyrics lookup and update checks — both anonymous and both can be turned off in settings.
 
-Licensed under [GPL-3.0](LICENSE) (with a GSAP linking exception). The "Sonorus" name and logo are not covered by the license — all rights reserved. Sonorus is an independent project, not affiliated with any music platform; see [NOTICE.md](NOTICE.md) for third-party attributions and disclaimers. Thanks to the open-source project Mineradio and its author XxHuberrr for the product inspiration.
+Licensed under [GPL-3.0](LICENSE) (with a GSAP linking exception). The "Audelyra" name and logo are not covered by the license — all rights reserved. Audelyra is an independent project, not affiliated with any music platform; see [NOTICE.md](NOTICE.md) for third-party attributions and disclaimers. Thanks to the open-source project Mineradio and its author XxHuberrr for the product inspiration.

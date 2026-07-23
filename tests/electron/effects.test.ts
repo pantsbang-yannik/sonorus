@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { applySettingsEffects, type EffectsDeps } from '../../electron/effects'
-import { DEFAULT_SETTINGS, type SonorusSettings } from '../../electron/settings'
+import { DEFAULT_SETTINGS, type AudelyraSettings } from '../../electron/settings'
 
 const make = (): { deps: EffectsDeps; calls: string[] } => {
   const calls: string[] = []
@@ -13,7 +13,7 @@ const make = (): { deps: EffectsDeps; calls: string[] } => {
     }
   }
 }
-const s = (patch: Partial<SonorusSettings>): SonorusSettings => ({ ...DEFAULT_SETTINGS, ...patch })
+const s = (patch: Partial<AudelyraSettings>): AudelyraSettings => ({ ...DEFAULT_SETTINGS, ...patch })
 
 describe('applySettingsEffects', () => {
   it('首次（prev=null）全量应用 loginItem；默认不开防休眠', () => {

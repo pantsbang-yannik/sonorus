@@ -15,7 +15,7 @@ const META_GAP = 20
 const META_LINE_H = 46    // 歌手/日期每行行高（字号 34，行距≈1.4 倍；亲验 fb①：落款两行化——歌手超长串+日期挤一行顶边缘，拆两行）
 const RIBBON_GAP = 44     // 亲验 fb①：同上，调剂给两行 meta
 const RIBBON_H = 72       // 声纹条高（细线化）
-const BRAND_H = 36        // SONORUS 字标行高
+const BRAND_H = 36        // AUDELYRA 字标行高
 const BRAND_BOTTOM = 76   // 字标锚定离底距离（主图高度随窗口变，字标钉底保版式稳定；亲验 fb①：同上，调剂给两行 meta）
 const BG_COLOR = '#05070c'          // 深空底色（与场景背景同族）
 const TITLE_COLOR = 'rgba(255, 255, 255, 0.95)'
@@ -57,12 +57,12 @@ export function layoutPoster(imageAspect: number, titleLines = 1, metaLines = 1)
   return { image, title, meta, ribbon, brand }
 }
 
-/** 下载文件名：`Sonorus-<title|untitled>-<yyyyMMdd-HHmmss>.png`，清洗非法字符、超长截断 */
+/** 下载文件名：`Audelyra-<title|untitled>-<yyyyMMdd-HHmmss>.png`，清洗非法字符、超长截断 */
 export function posterFilename(title: string, now: Date): string {
   const safe = title.replace(/[/\\:*?"<>|]/g, '_').trim().slice(0, 80) || 'untitled'
   const p = (n: number): string => String(n).padStart(2, '0')
   const stamp = `${now.getFullYear()}${p(now.getMonth() + 1)}${p(now.getDate())}-${p(now.getHours())}${p(now.getMinutes())}${p(now.getSeconds())}`
-  return `Sonorus-${safe}-${stamp}.png`
+  return `Audelyra-${safe}-${stamp}.png`
 }
 
 export { wrapTitleLines } from '../scenes/shared/wrap-lines'
@@ -190,7 +190,7 @@ export async function composePoster(
   ctx.fillStyle = BRAND_COLOR
   ctx.font = `500 28px ${FONT_STACK}`
   ctx.textBaseline = 'top'
-  const brand = 'S O N O R U S'
+  const brand = 'A U D E L Y R A'
   ctx.fillText(brand, L.brand.x + (L.brand.w - ctx.measureText(brand).width) / 2, L.brand.y)
 
   return new Promise<Blob>((resolve, reject) => {

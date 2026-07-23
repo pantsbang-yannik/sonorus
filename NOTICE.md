@@ -1,6 +1,6 @@
 # Third-Party Notices
 
-Sonorus bundles or links against the following third-party software and assets.
+Audelyra bundles or links against the following third-party software and assets.
 This file lists the attributions required by their respective licenses.
 
 ## Bundled Software
@@ -18,7 +18,7 @@ This file lists the attributions required by their respective licenses.
 
 - Source: <https://gsap.com>
 - License: GSAP Standard License (free of charge; not an open-source license)
-- Usage: animation library, bundled into the compiled output. Sonorus is
+- Usage: animation library, bundled into the compiled output. Audelyra is
   licensed under GPL-3.0 **with an additional permission** (GPL §7) allowing
   linking with GSAP; the GSAP portion of a combined work remains under its own
   license. See the License section of the README.
@@ -53,7 +53,7 @@ Attributions are also displayed in the in-app About panel.
 
 ## Third-Party Service Disclaimer
 
-Sonorus is an independent project. It is **not affiliated with, endorsed by, or
+Audelyra is an independent project. It is **not affiliated with, endorsed by, or
 sponsored by** Apple, LRCLIB, NetEase Cloud Music (网易云音乐), or any music
 platform or streaming service.
 

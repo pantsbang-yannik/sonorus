@@ -14,7 +14,7 @@ import {
 } from '../../electron/history'
 import type { TrackEvent } from '../../electron/nowplaying/types'
 
-const tmpFile = (): string => join(mkdtempSync(join(tmpdir(), 'sonorus-history-')), 'plays.jsonl')
+const tmpFile = (): string => join(mkdtempSync(join(tmpdir(), 'audelyra-history-')), 'plays.jsonl')
 
 const change = (title: string, artist = '歌手A', duration: number | null = 240): TrackEvent => ({
   kind: 'change',
@@ -179,11 +179,11 @@ describe('JSONL 追加与坏行容错', () => {
   })
 
   it('文件不存在：读回空数组', () => {
-    expect(readPlayRecords(join(tmpdir(), 'sonorus-none', 'nope.jsonl'))).toEqual([])
+    expect(readPlayRecords(join(tmpdir(), 'audelyra-none', 'nope.jsonl'))).toEqual([])
   })
 
   it('appendPlayRecord 自动建目录（mkdirSync recursive 惯例）', () => {
-    const file = join(mkdtempSync(join(tmpdir(), 'sonorus-history-')), 'deep', 'plays.jsonl')
+    const file = join(mkdtempSync(join(tmpdir(), 'audelyra-history-')), 'deep', 'plays.jsonl')
     appendPlayRecord(file, record('雾里'))
     expect(readFileSync(file, 'utf-8')).toContain('雾里')
   })

@@ -134,18 +134,18 @@ describe('posterFilename', () => {
   const now = new Date(2026, 6, 14, 15, 42, 7) // 本地时 2026-07-14 15:42:07
 
   it('常规歌名 + 紧凑时间戳', () => {
-    expect(posterFilename('雾里', now)).toBe('Sonorus-雾里-20260714-154207.png')
+    expect(posterFilename('雾里', now)).toBe('Audelyra-雾里-20260714-154207.png')
   })
 
   it('清洗文件系统非法字符', () => {
     expect(posterFilename('AC/DC: "Back" <in> Black?*|\\', now)).toBe(
-      'Sonorus-AC_DC_ _Back_ _in_ Black____-20260714-154207.png'
+      'Audelyra-AC_DC_ _Back_ _in_ Black____-20260714-154207.png'
     )
   })
 
   it('空/全非法歌名兜底 untitled（unknown 态）', () => {
-    expect(posterFilename('', now)).toBe('Sonorus-untitled-20260714-154207.png')
-    expect(posterFilename('   ', now)).toBe('Sonorus-untitled-20260714-154207.png')
+    expect(posterFilename('', now)).toBe('Audelyra-untitled-20260714-154207.png')
+    expect(posterFilename('   ', now)).toBe('Audelyra-untitled-20260714-154207.png')
   })
 
   it('超长歌名截断（文件名不爆）', () => {

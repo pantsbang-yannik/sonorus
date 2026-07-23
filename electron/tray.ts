@@ -17,7 +17,7 @@ export function createTray(
   icon.addRepresentation({ scaleFactor: 2, dataURL: `data:image/png;base64,${ICON_2X}` })
   icon.setTemplateImage(true)
   const tray = new Tray(icon)
-  tray.setToolTip('Sonorus')
+  tray.setToolTip('Audelyra')
   const refresh = (): void => {
     tray.setContextMenu(Menu.buildFromTemplate(buildTrayMenuTemplate(getMode(), actions)))
   }

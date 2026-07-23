@@ -30,7 +30,7 @@ export function installTraceControls(opts: {
         const jsonl = recorder.stop()
         const a = document.createElement('a')
         a.href = URL.createObjectURL(new Blob([jsonl], { type: 'application/jsonl' }))
-        a.download = `sonorus-trace-${Date.now()}.jsonl`
+        a.download = `audelyra-trace-${Date.now()}.jsonl`
         a.click()
         URL.revokeObjectURL(a.href)
         console.log('[trace] 已下载')

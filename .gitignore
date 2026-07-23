@@ -1,7 +1,7 @@
 node_modules/
 out/
 dist/
-native/mac-tap/sonorus-tap
+native/mac-tap/audelyra-tap
 *.log
 native/mac-tap/_CodeSignature/
 .DS_Store

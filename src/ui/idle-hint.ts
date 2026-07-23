@@ -41,7 +41,7 @@ export class IdleHint {
     const permission = makeSceneWrapper()
     const permLine1 = document.createElement('div')
     permLine1.setAttribute('data-role', 'idle-hint-permission')
-    permLine1.textContent = 'Sonorus 听不到系统声音'
+    permLine1.textContent = 'Audelyra 听不到系统声音'
     permLine1.style.cssText = `
       font-size: 15px;
       font-weight: 300;
@@ -49,7 +49,7 @@ export class IdleHint {
       color: rgba(255, 255, 255, 0.85);
     `
     const permLine2 = document.createElement('div')
-    permLine2.textContent = '系统设置 → 隐私与安全性 → 系统音频录制，确认 Sonorus 已开启'
+    permLine2.textContent = '系统设置 → 隐私与安全性 → 系统音频录制，确认 Audelyra 已开启'
     permLine2.style.cssText = `
       font-size: 12px;
       font-weight: 300;

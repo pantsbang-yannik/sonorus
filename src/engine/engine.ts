@@ -17,7 +17,7 @@ export function hybridBeatStrength(rank: number, energy: number): number {
   return Math.min(1, Math.max(0, BEAT_RANK_W * rank + BEAT_ENERGY_W * energy))
 }
 
-export class SonorusEngine {
+export class AudelyraEngine {
   readonly bus = new SignalBus()
   private pending = new Float32Array(0)
   private t = 0

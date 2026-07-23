@@ -69,12 +69,12 @@ describe('renderDiagnostics', () => {
       ...baseOpts,
       settings,
       homeDir: '/Users/tester',
-      log: [{ at: '2026-07-21T11:00:00.000Z', level: 'warn', source: 'capture', message: 'tap 二进制不存在: /Users/tester/dev/sonorus-tap' }]
+      log: [{ at: '2026-07-21T11:00:00.000Z', level: 'warn', source: 'capture', message: 'tap 二进制不存在: /Users/tester/dev/audelyra-tap' }]
     })
     expect(text).not.toContain('我的秘密歌名')
     expect(text).toContain('已略去，6 字')
     expect(text).not.toContain('/Users/tester') // macOS 用户名不出报告
-    expect(text).toContain('~/dev/sonorus-tap')
+    expect(text).toContain('~/dev/audelyra-tap')
     expect(text).toContain('"kind": "image"') // 非文字条目原样保留
   })
 

@@ -30,7 +30,7 @@ const MAX_RESTART_DELAY_MS = 60000
 export function resolveBinary(): string {
   const res = (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath
   const candidates = [
-    process.env.SONORUS_MEDIA_CONTROL,
+    process.env.AUDELYRA_MEDIA_CONTROL,
     res ? join(res, 'media-control', 'bin', 'media-control') : undefined,
     '/opt/homebrew/bin/media-control', // Apple Silicon Homebrew
     '/usr/local/bin/media-control', // Intel Homebrew

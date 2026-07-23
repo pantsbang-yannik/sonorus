@@ -118,7 +118,7 @@ describe('DropChoice（拖图松手后的用途选择条）', () => {
     const dc = new DropChoice(parent as unknown as HTMLElement, makeDeps({ setModalOpen }))
     const container = findByAttr(parent, 'data-role', 'drop-choice')!
     expect(container.style.display).toBe('none')
-    // 亲验实锤回归锚：#sonorus-overlay 根容器 pointer-events:none，浮层必须显式开回 auto——
+    // 亲验实锤回归锚：#audelyra-overlay 根容器 pointer-events:none，浮层必须显式开回 auto——
     // 漏掉=点击穿透到画布触发点外部关闭，回调静默失效但外观像"选择成功"
     expect(container.style.pointerEvents).toBe('auto')
     dc.ask(makeFile())

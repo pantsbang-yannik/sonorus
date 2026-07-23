@@ -39,7 +39,7 @@ export async function deleteCustomShapePng(dir: string, id: string): Promise<voi
 /** HEIC 等 Chromium 不解码的格式 → PNG（macOS 自带 sips，本应用 mac-only）。
  * 失败向上 throw：渲染层 invoke reject → 轻提示兜底，绝不静默吞（spec 已知坑） */
 export async function convertToPngViaSips(bytes: Uint8Array): Promise<Buffer> {
-  const stamp = `sonorus-convert-${process.pid}-${Date.now()}`
+  const stamp = `audelyra-convert-${process.pid}-${Date.now()}`
   const src = join(tmpdir(), `${stamp}.src`)
   const dst = join(tmpdir(), `${stamp}.png`)
   try {

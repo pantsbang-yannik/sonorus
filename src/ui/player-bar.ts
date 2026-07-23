@@ -1,5 +1,5 @@
 // 本地播放控制条:封面 + 双行曲目(标题/歌手) + 上下一首 + 播放/暂停 + 进度滑块 + 循环开关 + 关闭。
-// 挂 #sonorus-overlay(仓库铁律),常驻部件(非 Panel:不参与互斥/退台仲裁,同 TrackBadge 定位)。
+// 挂 #audelyra-overlay(仓库铁律),常驻部件(非 Panel:不参与互斥/退台仲裁,同 TrackBadge 定位)。
 // z-index 9995:在 dropOverlay(9996)之下——播放中再拖新文件,暗幕盖住控制条是正确语义。
 const FONT = `-apple-system, "PingFang SC", sans-serif`
 const EASE = 'cubic-bezier(0.33, 1, 0.68, 1)'

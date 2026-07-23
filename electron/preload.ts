@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from 'electron'
 
-contextBridge.exposeInMainWorld('sonorus', {
+contextBridge.exposeInMainWorld('audelyra', {
   onPcmFrame(cb: (frame: { sampleRate: number; channels: number; samples: Float32Array }) => void) {
     ipcRenderer.on('capture:pcm', (_e, msg) => {
       const buf: Uint8Array = msg.pcm

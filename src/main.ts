@@ -1,4 +1,4 @@
-import { SonorusEngine } from './engine/engine'
+import { AudelyraEngine } from './engine/engine'
 import { SceneHost } from './scenes/host'
 import { registerScene } from './scenes/registry'
 import { createPlaceholderScene } from './scenes/placeholder'
@@ -83,7 +83,7 @@ type RendererWindowMode = 'fullscreen' | 'windowed'
 
 declare global {
   interface Window {
-    sonorus: {
+    audelyra: {
       onPcmFrame(cb: (f: { sampleRate: number; channels: number; samples: Float32Array }) => void): void
       onCaptureStatus(cb: (s: string) => void): void
       onTrack(cb: (t: TrackMsg) => void): void
@@ -160,12 +160,12 @@ declare global {
 async function boot(): Promise<void> {
   // 渲染层未捕获错误进主进程诊断日志（发布准备③）：纯内存环形缓冲，仅用户导出报告时落盘。
   // 挂在 boot 最前——后续任何装配步骤抛错都能被记到
-  window.addEventListener('error', (e) => window.sonorus.logDiag('window', String(e.message).slice(0, 300)))
+  window.addEventListener('error', (e) => window.audelyra.logDiag('window', String(e.message).slice(0, 300)))
   window.addEventListener('unhandledrejection', (e) => {
-    window.sonorus.logDiag('promise', String(e.reason).split('\n')[0]?.slice(0, 300) ?? '')
+    window.audelyra.logDiag('promise', String(e.reason).split('\n')[0]?.slice(0, 300) ?? '')
   })
 
-  const engine = new SonorusEngine()
+  const engine = new AudelyraEngine()
   let liveMuted = false
   let replayActive = false
   let localActive = false
@@ -175,13 +175,13 @@ async function boot(): Promise<void> {
   // 原始帧能量探针（发布准备③）：「听到声音」判定与 bus 解耦——liveMuted 期间（demo/回放/本地）
   // 真实系统声照样被探到，引导成功判定与空状态提示都吃这一路
   let lastAudibleAt = -Infinity
-  window.sonorus.onPcmFrame((f) => {
+  window.audelyra.onPcmFrame((f) => {
     if (!liveMuted) engine.ingest(f)
     if (frameRms(f.samples) >= AUDIBLE_RMS) lastAudibleAt = performance.now()
   })
   // 捕获状态接入空状态提示（发布准备③ 权限闭环）：unavailable 从此有 UI 出路，不再只 console
   let captureUnavailable = false
-  window.sonorus.onCaptureStatus((s) => {
+  window.audelyra.onCaptureStatus((s) => {
     captureUnavailable = s === 'unavailable'
     console.log('capture:', s)
   })
@@ -203,7 +203,7 @@ async function boot(): Promise<void> {
     const { DebugView } = await import('./ui/debug/debug-view')
     const view = new DebugView(canvas)
     engine.bus.subscribe((s) => view.update(s))
-    window.sonorus.onTrack((t) => {
+    window.audelyra.onTrack((t) => {
       if (t.kind === 'change') view.setTrack(t.title, t.artist, t.artworkDataUrl)
       else view.setTrack('unknown', '', null)
     })
@@ -214,11 +214,11 @@ async function boot(): Promise<void> {
     const host = new SceneHost(canvas, engine.bus, {
       afterFrame: (now) => replayCapture?.(now),
       // 场景 init 失败进诊断日志（发布准备③）：内部 catch 吞掉的 WebGPU 失败 window.onerror 看不见
-      onInitError: (sceneName, err) => window.sonorus.logDiag('scene-init', `${sceneName}: ${String(err).slice(0, 300)}`)
+      onInitError: (sceneName, err) => window.audelyra.logDiag('scene-init', `${sceneName}: ${String(err).slice(0, 300)}`)
     })
 
     // 角标初始化
-    const overlayDiv = document.getElementById('sonorus-overlay') as HTMLElement
+    const overlayDiv = document.getElementById('audelyra-overlay') as HTMLElement
     const badge = new TrackBadge(overlayDiv)
 
     // 鼠标活动驱动显隐（保存引用便于清理）
@@ -279,7 +279,7 @@ async function boot(): Promise<void> {
       if (savedToastTimer) { clearTimeout(savedToastTimer); savedToastTimer = null }
     }
     savedToast.addEventListener('click', () => {
-      if (savedToastPath) window.sonorus.revealPoster(savedToastPath)
+      if (savedToastPath) window.audelyra.revealPoster(savedToastPath)
       hideSavedToast()
     })
     savedToast.addEventListener('mouseenter', () => { savedToast.style.color = 'rgba(255, 255, 255, 1)' })
@@ -314,7 +314,7 @@ async function boot(): Promise<void> {
     let lastSysTrack: SceneTrackEvent | null = null
     let lastSysProgress: ScenePlaybackProgress | null = null
     let lastSysLyrics: SceneLyricsDoc | null = null
-    window.sonorus.onTrack((t) => {
+    window.audelyra.onTrack((t) => {
       lastSysTrack = t as SceneTrackEvent
       // unknown 不清空（fb3：歌名没显示）：媒体会话闪断/切歌间隙常发 unknown，保留上一首已知曲目做落款——
       // 画面大概率就是它的；真错了预览模态可弃兜底
@@ -323,26 +323,26 @@ async function boot(): Promise<void> {
       host.notifyTrack(t as SceneTrackEvent)
       badge.setTrack(t as SceneTrackEvent)
     })
-    window.sonorus.onProgress((p) => { lastSysProgress = p; if (!localActive) host.notifyProgress(p) })
-    window.sonorus.onLyrics((d) => { lastSysLyrics = d; if (!localActive) host.notifyLyrics(d) })
+    window.audelyra.onProgress((p) => { lastSysProgress = p; if (!localActive) host.notifyProgress(p) })
+    window.audelyra.onLyrics((d) => { lastSysLyrics = d; if (!localActive) host.notifyLyrics(d) })
 
     // ===== 更新体系 v1（发布准备②）：轻提示卡/强更阻断层 + 手动检查回音 =====
     // 订阅须先于 rendererReady 报到（同歌词冷启动纪律）：reload 后主进程补发未结算决策不能落空。
     // 但 modalCount 版 setModal 定义在装配后段——前向引用（主进程 manualUpdateCheck 同款手法），
     // 直连 setModalOpen 会绕过计数仲裁：后续面板开合归零就把强更的模态位覆盖掉（审修 I2）。
     // 占位兜底直写布尔：只在 forced 早于 modalCount 赋值到达的极窄窗口生效，聊胜于丢
-    let updateSetModal: (open: boolean) => void = (open) => window.sonorus.setModalOpen(open)
+    let updateSetModal: (open: boolean) => void = (open) => window.audelyra.setModalOpen(open)
     const updateNotice = new UpdateNotice(overlayDiv, {
-      openDownload: (url) => window.sonorus.openUpdateDownload(url),
-      skip: (version) => window.sonorus.skipUpdate(version),
+      openDownload: (url) => window.audelyra.openUpdateDownload(url),
+      skip: (version) => window.audelyra.skipUpdate(version),
       showMessage: (text) => showTopToast(text, null),
       setModal: (open) => updateSetModal(open)
     })
-    window.sonorus.onUpdateStatus((d) => updateNotice.handleStatus(d as UpdateStatusMsg))
+    window.audelyra.onUpdateStatus((d) => updateNotice.handleStatus(d as UpdateStatusMsg))
 
     // 报到必须在三订阅挂完之后（#歌词冷启动）：主进程收到才补发缓存的 track/lyrics/progress，
     // 根治 did-finish-load 与订阅注册之间的空窗（boot 内 await 越多空窗越大，dev 动态 import 尤甚）
-    window.sonorus.rendererReady()
+    window.audelyra.rendererReady()
 
     // ===== 本地音频播放（V2：会话队列+标签歌词；V1 管道 <audio>→worklet→engine 原样复用）=====
     const queue = new LocalQueue()
@@ -381,7 +381,7 @@ async function boot(): Promise<void> {
       },
       onPlayState: (playing) => {
         playerBar.setPlaying(playing)
-        if (localActive) window.sonorus.localProgress(playing) // 聆听钟暂停/恢复
+        if (localActive) window.audelyra.localProgress(playing) // 聆听钟暂停/恢复
       },
       onEnded: () => {
         const nxt = queue.advance()
@@ -418,7 +418,7 @@ async function boot(): Promise<void> {
         host.notifyTrack(ev)
         badge.setTrack(ev)
         posterMeta = { title: g.title, artist: g.artist }
-        window.sonorus.localTrackChange({ title: g.title, artist: g.artist, duration: g.duration, coverBytes: g.coverBytes, coverMime: g.coverMime })
+        window.audelyra.localTrackChange({ title: g.title, artist: g.artist, duration: g.duration, coverBytes: g.coverBytes, coverMime: g.coverMime })
         void lookupLocalLyrics(t)
       } else {
         // 无标签(或还没解析完):文件名兜底,不进历史/星系;localTrackStop 顺手结算上一首的钟
@@ -426,13 +426,13 @@ async function boot(): Promise<void> {
         host.notifyTrack({ kind: 'unknown' })
         badge.setTrack({ kind: 'unknown' })
         posterMeta = { title: t.displayName, artist: '' }
-        window.sonorus.localTrackStop()
+        window.audelyra.localTrackStop()
       }
     }
     const lookupLocalLyrics = async (t: QueueTrack): Promise<void> => {
       if (t.tag.kind !== 'tagged') return
       const key = `${t.tag.title}\0${t.tag.artist}`
-      const lines = await window.sonorus.lookupLyrics(t.tag.title, t.tag.artist, t.tag.duration)
+      const lines = await window.audelyra.lookupLyrics(t.tag.title, t.tag.artist, t.tag.duration)
       if (!localActive || queue.current?.id !== t.id) return // 已切歌/已退出,过期结果丢弃
       host.notifyLyrics(lines ? { key, lines } : { key, none: true })
     }
@@ -448,7 +448,7 @@ async function boot(): Promise<void> {
       failStreak = 0
       localActive = true
       updateLiveMute()
-      window.sonorus.localProgress(true) // load 成功即在播:首帧 play 事件早于 localActive 置位,聆听钟起表不能靠残留的 playing 兜底
+      window.audelyra.localProgress(true) // load 成功即在播:首帧 play 事件早于 localActive 置位,聆听钟起表不能靠残留的 playing 兜底
       playerBar.show(t.displayName)
       playerBar.setLoop(queue.loop)
       refreshQueueUi()
@@ -481,7 +481,7 @@ async function boot(): Promise<void> {
     }
     const stopLocalPlayback = (): void => {
       localPlayer.stop()
-      window.sonorus.localTrackStop() // 结算聆听钟(不足 30s 自然丢弃)
+      window.audelyra.localTrackStop() // 结算聆听钟(不足 30s 自然丢弃)
       queue.clear()
       failStreak = 0
       refreshQueueUi()
@@ -518,81 +518,81 @@ async function boot(): Promise<void> {
     let modalCount = 0
     const setModal = (open: boolean): void => {
       modalCount = Math.max(0, modalCount + (open ? 1 : -1))
-      window.sonorus.setModalOpen(modalCount > 0)
+      window.audelyra.setModalOpen(modalCount > 0)
     }
     updateSetModal = setModal // 前向引用接真值（审修 I2）：强更阻断从此走计数仲裁，不再被面板开合覆盖
 
     const coordinator = new PanelCoordinator({ uiStage, setModal })
 
     const panel = new SettingsPanel(overlayDiv, {
-      getSettings: () => window.sonorus.getSettings(),
-      setSettings: (p) => window.sonorus.setSettings(p),
-      onSettingsChanged: (cb) => window.sonorus.onSettingsChanged(cb),
-      getVersion: () => window.sonorus.getAppVersion(),
-      onCheckUpdate: () => window.sonorus.checkUpdate(),
+      getSettings: () => window.audelyra.getSettings(),
+      setSettings: (p) => window.audelyra.setSettings(p),
+      onSettingsChanged: (cb) => window.audelyra.onSettingsChanged(cb),
+      getVersion: () => window.audelyra.getAppVersion(),
+      onCheckUpdate: () => window.audelyra.checkUpdate(),
       // 导出诊断（发布准备③）：回执带路径→顶部轻提示可点击 Finder 定位（复用海报落盘同款回音）
       onExportDiagnostics: () => {
-        void window.sonorus.exportDiagnostics()
+        void window.audelyra.exportDiagnostics()
           .then((r) => showTopToast('诊断报告已保存到「下载」文件夹 · 点击查看', r.path))
           .catch(() => showToast('诊断报告导出失败'))
       }
     })
     coordinator.register(panel, 'full')
-    window.sonorus.onOpenSettingsRequest(() => panel.toggle())
+    window.audelyra.onOpenSettingsRequest(() => panel.toggle())
 
     // 调音台：右侧竖向停靠栏，专业槽位层（Slice ① 收官）。收敛到 BasePanel 后与设置面板同经
     // 协调器仲裁——保持互斥，退台 profile='camera'（仅镜头后拉，不像设置那样接管整场景，
     // 粒子云仍占主画面，见 tuning-panel.ts 顶部注释）
     const tuningPanel = new TuningPanel(overlayDiv, {
-      getMapping: async () => (await window.sonorus.getSettings()).mapping,
-      previewMapping: (m) => window.sonorus.previewMapping(m),
-      commitMapping: (m) => window.sonorus.commitMapping(m),
-      getShape: async () => (await window.sonorus.getSettings()).shape,
-      setShape: (s) => window.sonorus.setSettings({ shape: s }),
-      onShapeChanged: (cb) => window.sonorus.onSettingsChanged((s) => cb(s.shape)),
-      getMotion: async () => (await window.sonorus.getSettings()).motion,
-      previewMotion: (m) => window.sonorus.previewMotion(m),
-      commitMotion: (m) => window.sonorus.commitMotion(m),
-      getCamera: async () => (await window.sonorus.getSettings()).camera,
-      previewCamera: (c) => window.sonorus.previewCamera(c),
-      commitCamera: (c) => window.sonorus.commitCamera(c),
+      getMapping: async () => (await window.audelyra.getSettings()).mapping,
+      previewMapping: (m) => window.audelyra.previewMapping(m),
+      commitMapping: (m) => window.audelyra.commitMapping(m),
+      getShape: async () => (await window.audelyra.getSettings()).shape,
+      setShape: (s) => window.audelyra.setSettings({ shape: s }),
+      onShapeChanged: (cb) => window.audelyra.onSettingsChanged((s) => cb(s.shape)),
+      getMotion: async () => (await window.audelyra.getSettings()).motion,
+      previewMotion: (m) => window.audelyra.previewMotion(m),
+      commitMotion: (m) => window.audelyra.commitMotion(m),
+      getCamera: async () => (await window.audelyra.getSettings()).camera,
+      previewCamera: (c) => window.audelyra.previewCamera(c),
+      commitCamera: (c) => window.audelyra.commitCamera(c),
       // 歌词歌名 tab（批2）：preview 直调 host（拖动实时、不落盘），commit 走 setSettings 落盘；
       // 落盘回流订阅会再 apply 一次同值，幂等无害
-      getTitleFx: async () => (await window.sonorus.getSettings()).title,
+      getTitleFx: async () => (await window.audelyra.getSettings()).title,
       previewTitleFx: (t) => host.applyTitle(t),
-      commitTitleFx: (t) => window.sonorus.setSettings({ title: t }),
-      getLyricsFx: async () => (await window.sonorus.getSettings()).lyrics,
+      commitTitleFx: (t) => window.audelyra.setSettings({ title: t }),
+      getLyricsFx: async () => (await window.audelyra.getSettings()).lyrics,
       previewLyricsFx: (s) => host.applyLyrics(s),
-      commitLyricsFx: (s) => window.sonorus.setSettings({ lyrics: s }),
+      commitLyricsFx: (s) => window.audelyra.setSettings({ lyrics: s }),
       // 背景 tab（虚空之镜）：preview 直调 host（拖动实时、不落盘），commit 走 setSettings 落盘；同 lyrics 语义
-      getBackgroundFx: async () => (await window.sonorus.getSettings()).background,
+      getBackgroundFx: async () => (await window.audelyra.getSettings()).background,
       previewBackgroundFx: (b) => host.applyBackground(b),
-      commitBackgroundFx: (b) => window.sonorus.setSettings({ background: b }),
+      commitBackgroundFx: (b) => window.audelyra.setSettings({ background: b }),
       // 背景回流（自定义背景 v1）：shape-picker 也会改 background，draft 不吃回流会在下次 commit
       // 把过期 customBackgrounds/current 整包写回（静默撤销选择）
-      onBackgroundChanged: (cb) => window.sonorus.onSettingsChanged((s) => cb(s.background)),
+      onBackgroundChanged: (cb) => window.audelyra.onSettingsChanged((s) => cb(s.background)),
     })
     coordinator.register(tuningPanel, 'camera')
 
     // 自定义形状创建（idea #12 Task 7）：图片走 ingest 降采样+可用性校验，文字直接落盘设置——
     // 两条路径共用「收藏已满」与「保存/生成失败」的轻提示出口
-    const currentShape = async (): Promise<ShapeSettings> => (await window.sonorus.getSettings()).shape
+    const currentShape = async (): Promise<ShapeSettings> => (await window.audelyra.getSettings()).shape
 
     const createShapeFromImage = async (file: File): Promise<void> => {
       if (!isSupportedImage(file.name, file.type)) { showToast(ingestErrorText('unsupported')); return }
       let shape = await currentShape()
       if (shape.customShapes.length >= CUSTOM_SHAPES_MAX) { showToast('收藏已满，先删一个'); return } // 早退快检：省去已满时的解码/sips 开销
       try {
-        const { imageData, png } = await decodeImageFile(file, (b) => window.sonorus.convertImageToPng(b))
+        const { imageData, png } = await decodeImageFile(file, (b) => window.audelyra.convertImageToPng(b))
         const usable = checkImageUsable(imageData)
         if (usable !== 'ok') { showToast(ingestErrorText(usable)); return }
         const id = crypto.randomUUID()
-        await window.sonorus.saveCustomShape(id, new Uint8Array(await png.arrayBuffer())) // 先文件后设置：设置是权威，文件缺失可兜底，反之是孤儿元数据
+        await window.audelyra.saveCustomShape(id, new Uint8Array(await png.arrayBuffer())) // 先文件后设置：设置是权威，文件缺失可兜底，反之是孤儿元数据
         // decode/sips 可达数秒：落盘成功后重取快照再拼 setSettings，防窗口期内用户删卡/拨开关/并发创建
         // 被整段覆盖回滚（终审 Finding 2）——上面的早退快检基于旧快照，这里才是权威判定
         shape = await currentShape()
         if (shape.customShapes.length >= CUSTOM_SHAPES_MAX) { showToast('收藏已满，先删一个'); return }
-        window.sonorus.setSettings({ shape: { ...shape, customShapes: [...shape.customShapes, { id, kind: 'image' }], customCurrent: id } })
+        window.audelyra.setSettings({ shape: { ...shape, customShapes: [...shape.customShapes, { id, kind: 'image' }], customCurrent: id } })
       } catch (err) {
         console.warn('[main] 自定义形状创建失败', err)
         showToast(ingestErrorText('failed'))
@@ -605,12 +605,12 @@ async function boot(): Promise<void> {
       const id = crypto.randomUUID() // meta.id 与 customCurrent 必须同一个值（选中即新条目）
       const shape = await currentShape() // 落盘前才取快照（与 createShapeFromImage 统一口径，终审 Finding 2）；本路径无中间异步步骤，单次取值已是权威判定
       if (shape.customShapes.length >= CUSTOM_SHAPES_MAX) { showToast('收藏已满，先删一个'); return }
-      window.sonorus.setSettings({ shape: { ...shape, customShapes: [...shape.customShapes, { id, kind: 'text', text: t }], customCurrent: id } })
+      window.audelyra.setSettings({ shape: { ...shape, customShapes: [...shape.customShapes, { id, kind: 'text', text: t }], customCurrent: id } })
     }
 
     // 背景创建（自定义背景 v1）：口径对齐 createShapeFromImage——早退快检省解码开销，
     // 落盘成功后重取快照再拼 setSettings（防窗口期并发覆盖，终审 Finding 2 同款纪律）
-    const currentBackground = async (): Promise<BackgroundSettings> => (await window.sonorus.getSettings()).background
+    const currentBackground = async (): Promise<BackgroundSettings> => (await window.audelyra.getSettings()).background
     // 卡片显示名（亲验反馈）：原文件名去扩展名；sanitize 侧截 80 字符兜底
     const bgDisplayName = (fileName: string): string => fileName.replace(/\.[^.]+$/, '')
 
@@ -619,12 +619,12 @@ async function boot(): Promise<void> {
       let bg = await currentBackground()
       if (bg.customBackgrounds.length >= CUSTOM_BACKGROUNDS_MAX) { showToast('背景已满，先删一个'); return }
       try {
-        const { jpeg } = await decodeBackgroundFile(file, (b) => window.sonorus.convertImageToPng(b))
+        const { jpeg } = await decodeBackgroundFile(file, (b) => window.audelyra.convertImageToPng(b))
         const id = crypto.randomUUID()
-        await window.sonorus.saveCustomBackground(id, new Uint8Array(await jpeg.arrayBuffer())) // 先文件后设置：settings 是权威
+        await window.audelyra.saveCustomBackground(id, new Uint8Array(await jpeg.arrayBuffer())) // 先文件后设置：settings 是权威
         bg = await currentBackground()
         if (bg.customBackgrounds.length >= CUSTOM_BACKGROUNDS_MAX) { showToast('背景已满，先删一个'); return }
-        window.sonorus.setSettings({ background: { ...bg, customBackgrounds: [...bg.customBackgrounds, { id, kind: 'image', name: bgDisplayName(file.name) }], current: id } })
+        window.audelyra.setSettings({ background: { ...bg, customBackgrounds: [...bg.customBackgrounds, { id, kind: 'image', name: bgDisplayName(file.name) }], current: id } })
       } catch (err) {
         console.warn('[main] 自定义背景创建失败', err)
         showToast('背景创建失败，换张图试试')
@@ -638,23 +638,23 @@ async function boot(): Promise<void> {
       if (bg.customBackgrounds.length >= CUSTOM_BACKGROUNDS_MAX) { showToast('背景已满，先删一个'); return }
       if (file.size > BACKGROUND_VIDEO_MAX_BYTES) { showToast('视频太大（≤500MB）'); return }
       try {
-        const path = window.sonorus.getPathForFile(file)
+        const path = window.audelyra.getPathForFile(file)
         const id = crypto.randomUUID()
-        await window.sonorus.saveCustomBackgroundVideo(id, path) // 先文件后设置：settings 是权威
+        await window.audelyra.saveCustomBackgroundVideo(id, path) // 先文件后设置：settings 是权威
         try {
           const url = URL.createObjectURL(file)
           try {
             const { jpeg } = await captureVideoThumb(url)
-            await window.sonorus.saveCustomBackgroundThumb(id, new Uint8Array(await jpeg.arrayBuffer()))
+            await window.audelyra.saveCustomBackgroundThumb(id, new Uint8Array(await jpeg.arrayBuffer()))
           } finally { URL.revokeObjectURL(url) }
         } catch { /* 缩略图缺失=卡片占位兜底，不阻断入库 */ }
         bg = await currentBackground()
         if (bg.customBackgrounds.length >= CUSTOM_BACKGROUNDS_MAX) {
           showToast('背景已满，先删一个')
-          void window.sonorus.deleteCustomBackground(id) // 已落盘的 500MB 视频没写进设置就成孤儿，幂等删除闭环
+          void window.audelyra.deleteCustomBackground(id) // 已落盘的 500MB 视频没写进设置就成孤儿，幂等删除闭环
           return
         }
-        window.sonorus.setSettings({ background: { ...bg, customBackgrounds: [...bg.customBackgrounds, { id, kind: 'video', name: bgDisplayName(file.name) }], current: id } })
+        window.audelyra.setSettings({ background: { ...bg, customBackgrounds: [...bg.customBackgrounds, { id, kind: 'video', name: bgDisplayName(file.name) }], current: id } })
       } catch (err) {
         console.warn('[main] 视频背景创建失败', err)
         showToast('视频背景创建失败，换个文件试试')
@@ -692,7 +692,7 @@ async function boot(): Promise<void> {
     })
 
     // ===== 星系图鉴（idea #4）：数据管线 + 双入口 + 筛选/胶囊 + 状态单向流 =====
-    setGalaxyArtworkFetcher((key) => window.sonorus.readHistoryArtwork(key))
+    setGalaxyArtworkFetcher((key) => window.audelyra.readHistoryArtwork(key))
     const galaxyBar = new GalaxyBar(overlayDiv, { onFilterChange: (f) => { setGalaxyFilter(f) } })
     const galaxyCard = new GalaxyCard(overlayDiv, {
       onPickDay: (date) => setGalaxyFilter({ kind: 'day', date }),
@@ -747,7 +747,7 @@ async function boot(): Promise<void> {
       if (tintCache.has(artworkKey)) return tintCache.get(artworkKey)!
       let tint: [number, number, number] | null = null
       try {
-        const bytes = await window.sonorus.readHistoryArtwork(artworkKey)
+        const bytes = await window.audelyra.readHistoryArtwork(artworkKey)
         if (bytes) {
           // 同 covers.ts decodeBitmap 已知 TS 泛型冲突（Uint8Array<ArrayBufferLike> 不满足 BlobPart）：
           // 显式裁剪出精确字节范围再断言 ArrayBuffer，本项目从不跨 Worker 传 SharedArrayBuffer，安全
@@ -788,7 +788,7 @@ async function boot(): Promise<void> {
       nonSilentSince = null
       setModal(true) // 评审 P1-2：参与模态仲裁——主进程 Esc 不再抢跑（全屏下退星系不连退全屏）
       try {
-        galaxyRecords = await window.sonorus.readHistory()
+        galaxyRecords = await window.audelyra.readHistory()
       } catch (err) {
         console.warn('[galaxy] 历史读取失败，按空宇宙处理', err)
         galaxyRecords = []
@@ -879,27 +879,27 @@ async function boot(): Promise<void> {
 
     // 形状选择器（Phase B2）：底部卡片层，camera 退台 + 与设置/调音台互斥（PanelLike 结构注册）
     const shapePicker = new ShapePicker(overlayDiv, {
-      getShape: async () => (await window.sonorus.getSettings()).shape,
-      setShape: (s) => window.sonorus.setSettings({ shape: s }),
-      onShapeChanged: (cb) => window.sonorus.onSettingsChanged((s) => cb(s.shape)),
+      getShape: async () => (await window.audelyra.getSettings()).shape,
+      setShape: (s) => window.audelyra.setSettings({ shape: s }),
+      onShapeChanged: (cb) => window.audelyra.onSettingsChanged((s) => cb(s.shape)),
       onOpenStateChanged: (open) => {
         shapePickerOpen = open; updateSuppressed() // 选择器是前台主角：角标/全屏提示让位（B2 亲验反馈，重叠实锤）——
         // 与 galaxy 共用布尔汇流后经 updateSuppressed 统一写入（评审 P1-5，防两者直写互踩）
         playerBar.setSuppressed(open) // 同惯例：底部全宽卡片打开时会压在 PlayerBar 上，一并让位
         if (!open) lastAudioTs = performance.now() // 关闭=刚交互完,重开一轮空闲窗——否则空闲已超时会秒进星系（同 exitGalaxy 语义）
       },
-      readCustomShapeImage: (id) => window.sonorus.readCustomShape(id),
-      deleteCustomShapeFile: (id) => { void window.sonorus.deleteCustomShape(id) },
+      readCustomShapeImage: (id) => window.audelyra.readCustomShape(id),
+      deleteCustomShapeFile: (id) => { void window.audelyra.deleteCustomShape(id) },
       onCreateRequest: () => shapeCreate.open(),
       showHint: showToast,
       // 背景 dep 全套接线（自定义背景 v1 Task 8）：三件必填镜像 getShape/setShape/onShapeChanged，
       // 三件可选补齐收藏卡的文件读写与「+」卡上传入口
-      getBackground: async () => (await window.sonorus.getSettings()).background,
-      setBackground: (b) => window.sonorus.setSettings({ background: b }),
-      onBackgroundChanged: (cb) => window.sonorus.onSettingsChanged((s) => cb(s.background)),
-      readCustomBackgroundImage: (id) => window.sonorus.readCustomBackground(id),
-      readCustomBackgroundThumb: (id) => window.sonorus.readCustomBackgroundThumb(id),
-      deleteCustomBackgroundFile: (id) => { void window.sonorus.deleteCustomBackground(id) },
+      getBackground: async () => (await window.audelyra.getSettings()).background,
+      setBackground: (b) => window.audelyra.setSettings({ background: b }),
+      onBackgroundChanged: (cb) => window.audelyra.onSettingsChanged((s) => cb(s.background)),
+      readCustomBackgroundImage: (id) => window.audelyra.readCustomBackground(id),
+      readCustomBackgroundThumb: (id) => window.audelyra.readCustomBackgroundThumb(id),
+      deleteCustomBackgroundFile: (id) => { void window.audelyra.deleteCustomBackground(id) },
       onBackgroundCreateRequest: () => { bgFileInput.click() },
       // 卡片编辑钮（v2 亲验反馈②）：picker 侧已先选中该卡，这里开调音台直落对应页（互斥退台归协调器）
       onEditRequest: (tab) => { tuningPanel.openToTab(tab) },
@@ -938,7 +938,7 @@ async function boot(): Promise<void> {
           setModal(false)
         }
         if (choice === 'save') {
-          const res = await window.sonorus.savePoster(filename, new Uint8Array(await blob.arrayBuffer()))
+          const res = await window.audelyra.savePoster(filename, new Uint8Array(await blob.arrayBuffer()))
           showSavedToast(res.path) // fb5：成功反馈=应用内轻提示（可点击定位），系统通知已退役
         }
       } catch (err) {
@@ -970,7 +970,7 @@ async function boot(): Promise<void> {
           setModal(false)
         }
         if (choice === 'save') {
-          const res = await window.sonorus.saveClip(filename, new Uint8Array(await clip.blob.arrayBuffer()))
+          const res = await window.audelyra.saveClip(filename, new Uint8Array(await clip.blob.arrayBuffer()))
           showSavedToast(res.path) // 轻提示点击→Finder 定位，revealPoster 通道复用
         }
       } catch (err) {
@@ -1017,7 +1017,7 @@ async function boot(): Promise<void> {
     // 右上模式/系统角：全屏（迁自 FullscreenButton）+ 星系图鉴/设置（迁自操作坞）——
     // 「改变整个界面状态」的入口归右上（主界面布局重组）；设置就近右上面板弹出位
     const corner = new CornerCluster(overlayDiv, {
-      setWindowMode: (m) => window.sonorus.setWindowMode(m),
+      setWindowMode: (m) => window.audelyra.setWindowMode(m),
       toggleSettings: () => panel.toggle(),
       toggleGalaxy: () => { if (galaxyOn) exitGalaxy(); else void enterGalaxy(false) }
     })
@@ -1032,11 +1032,11 @@ async function boot(): Promise<void> {
       corner.setMode(m)
       dragStrip.setMode(m)
     }
-    window.sonorus.onWindowMode(applyWindowMode)
-    void window.sonorus.getWindowMode().then(applyWindowMode)
+    window.audelyra.onWindowMode(applyWindowMode)
+    void window.audelyra.getWindowMode().then(applyWindowMode)
 
     // 档位：'auto' 交给 nebula 自选（forcedTier 缺省），手动档位直接强制
-    const initial = await window.sonorus.getSettings()
+    const initial = await window.audelyra.getSettings()
     let appliedTier: RendererSettings['tier'] = initial.tier
     const forced = (t: RendererSettings['tier']): QualityTier | undefined =>
       t === 'auto' ? undefined : TIERS[t]
@@ -1045,12 +1045,12 @@ async function boot(): Promise<void> {
     host.applyLyrics(initial.lyrics) // 歌词设置播种（重放语义同 title）
     // 自定义背景 fetcher 接线（自定义背景 v1 Task 8）：必须在 host.applyBackground(initial.background) 之前——
     // 启动恢复自定义选中时 UserBackdrop 才取得到文件（同 setCustomShapeFetcher/applyShape 先例，防 fetcher 未就绪时静默回落极光）
-    setCustomBackgroundFetcher((id) => window.sonorus.readCustomBackground(id))
+    setCustomBackgroundFetcher((id) => window.audelyra.readCustomBackground(id))
     host.applyBackground(initial.background) // 背景（虚空之镜）设置播种（重放语义同 lyrics）
     host.applyMapping(initial.mapping) // host.start 之后调用以命中当前场景实例
     // 自定义形状 fetcher 接线（idea #12）：必须在 host.applyShape(initial.shape) 之前——
     // 启动恢复自定义选中时 CustomShapeController 才取得到文件（不能照抄 loadContourAssets 更靠后的接线点）
-    setCustomShapeFetcher((id) => window.sonorus.readCustomShape(id))
+    setCustomShapeFetcher((id) => window.audelyra.readCustomShape(id))
     host.applyShape(initial.shape) // 形状与映射同点重放（评审 I3：档位重建也走 host 缓存）
     host.applyMotion(initial.motion) // 运动方言同点重放（Phase C2 T5）
     host.applyCamera(initial.camera) // 镜头活跃度同点重放（Phase D）
@@ -1058,19 +1058,19 @@ async function boot(): Promise<void> {
     // 轮廓形状（心脏）异步资产加载：未就绪 generate 返回 null → 仲裁回退星云；
     // 每个资产就绪后重放一次当前 shape settings = 自动补切（S2 spec §4.3）
     loadContourAssets(
-      (id) => window.sonorus.getShapeAsset(id),
+      (id) => window.audelyra.getShapeAsset(id),
       async () => {
         // 序幕期跳过补切重放：持久化形状会覆写瞬态站形体（首站启动竞态实锤）；
         // 判定放 await 之后——getSettings 在途时序幕开演同样要拦。停演后 stopDemo 自会恢复真形状
-        const s = await window.sonorus.getSettings()
+        const s = await window.audelyra.getSettings()
         if (!demoActive) host.applyShape(s.shape)
       },
     )
 
     // mapping 实时预览（拖动每帧广播，不落盘）：主进程原样转发，直接喂运行中场景
-    window.sonorus.onMappingChanged((m) => host.applyMapping(m))
-    window.sonorus.onMotionChanged((m) => host.applyMotion(m))
-    window.sonorus.onCameraChanged((c) => host.applyCamera(c))
+    window.audelyra.onMappingChanged((m) => host.applyMapping(m))
+    window.audelyra.onMotionChanged((m) => host.applyMotion(m))
+    window.audelyra.onCameraChanged((c) => host.applyCamera(c))
 
     // 首启引导：星云舞台上的一幕（拒绝授权不报错只静音，判定靠信号交叉，见 onboarding-logic）
     // 放 host.start 之后——引导要星云已经在跑。
@@ -1079,7 +1079,7 @@ async function boot(): Promise<void> {
     let onboardedFlag = initial.onboarded // 空状态提示的引导完成门（onDone 当刻置真，不等设置回流）
     if (!initial.onboarded) {
       let lastTrackKind: 'change' | 'unknown' = 'unknown'
-      window.sonorus.onTrack((t) => { lastTrackKind = t.kind }) // 与既有 onTrack 订阅并存（preload 是多播 on）
+      window.audelyra.onTrack((t) => { lastTrackKind = t.kind }) // 与既有 onTrack 订阅并存（preload 是多播 on）
 
       const demoScript = new OnboardingDemoScript()
       let demoPlayback: DemoPlayback | null = null
@@ -1101,7 +1101,7 @@ async function boot(): Promise<void> {
         if (demoActive) {
           demoActive = false
           updateLiveMute() // 停演即解除静音，真实信号无缝接管
-          void window.sonorus.getSettings().then((s) => host.applyShape(s.shape)) // 恢复用户真形状（瞬态站形体不落盘）
+          void window.audelyra.getSettings().then((s) => host.applyShape(s.shape)) // 恢复用户真形状（瞬态站形体不落盘）
           // 序幕资产收尾卸载（审①P2-3/审②P2-9）：raw 点数据 + 生成态点云共 ~30MB 只属首启会话
           unloadContourAssets(DEMO_CONTOUR_IDS)
           evictShapeCache(DEMO_SHAPE_IDS)
@@ -1122,8 +1122,8 @@ async function boot(): Promise<void> {
         // 缺失 → contourCloud null → 自由态星云兜底
         loadContourAssets(
           // 加载失败除星云兜底外必须留痕（「静默跳过掩盖 P0」教训）：外送诊断日志，导出报告可见
-          (id) => window.sonorus.getShapeAsset(id).catch((err: unknown) => {
-            window.sonorus.logDiag('onboarding', `序幕形体资产 ${id} 加载失败：${String(err)}`)
+          (id) => window.audelyra.getShapeAsset(id).catch((err: unknown) => {
+            window.audelyra.logDiag('onboarding', `序幕形体资产 ${id} 加载失败：${String(err)}`)
             throw err
           }),
           () => { if (demoActive) applyStation(demoScript.currentShape) },
@@ -1136,8 +1136,8 @@ async function boot(): Promise<void> {
         // 原始帧能量探针（spec §1.3 判定改道）：demo 信号灌 bus 不会造成假成功
         latestHasAudio: () => performance.now() - lastAudibleAt < 1000,
         hasTrack: () => lastTrackKind === 'change',
-        restartCapture: () => window.sonorus.restartCapture(),
-        openAudioPrefs: () => window.sonorus.openAudioCapturePrefs(),
+        restartCapture: () => window.audelyra.restartCapture(),
+        openAudioPrefs: () => window.audelyra.openAudioCapturePrefs(),
         prologue: playback
           ? {
               advance: () => {
@@ -1164,7 +1164,7 @@ async function boot(): Promise<void> {
         },
         onDone: () => {
           onboardedFlag = true
-          window.sonorus.setSettings({ onboarded: true })
+          window.audelyra.setSettings({ onboarded: true })
         }
       })
     }
@@ -1172,8 +1172,8 @@ async function boot(): Promise<void> {
     // ===== 空状态教学 + 权限闭环（发布准备③ spec §2）：引导之后的长期出路 =====
     // 1s 采样：audible 走原始帧探针（bus 冻结/回放污染都不影响）；suppressed 汇流所有前台活动
     const idleHint = new IdleHint(overlayDiv, {
-      openAudioPrefs: () => window.sonorus.openAudioCapturePrefs(),
-      restartCapture: () => window.sonorus.restartCapture()
+      openAudioPrefs: () => window.audelyra.openAudioCapturePrefs(),
+      restartCapture: () => window.audelyra.restartCapture()
     })
     const idleHintLogic = new IdleHintLogic()
     const IDLE_HINT_TICK_MS = 1000
@@ -1189,7 +1189,7 @@ async function boot(): Promise<void> {
       idleHint.setState(state)
     }, IDLE_HINT_TICK_MS)
 
-    window.sonorus.onSettingsChanged((s) => {
+    window.audelyra.onSettingsChanged((s) => {
       if (s.tier !== appliedTier) {
         appliedTier = s.tier
         void host.start('nebula', TIERS.high, forced(s.tier)) // start 自带重入令牌，连点安全

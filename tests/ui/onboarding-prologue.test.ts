@@ -70,9 +70,9 @@ function byRole(role: string): FakeEl | undefined {
   return created.find((el) => el.attrs['data-role'] === role)
 }
 
-/** intro 幕容器 = textContent 为 SONORUS 的字标的父级 */
+/** intro 幕容器 = textContent 为 AUDELYRA 的字标的父级 */
 function introScene(): FakeEl {
-  const title = created.find((el) => el.textContent === 'SONORUS')!
+  const title = created.find((el) => el.textContent === 'AUDELYRA')!
   return created.find((el) => el.children.includes(title))!
 }
 
